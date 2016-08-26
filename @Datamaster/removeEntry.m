@@ -10,7 +10,7 @@ function removeEntry(dm,varargin)
     if strcmp(choice,'Yes')
         %Delete Datasources
         for i = 1:length(entry.FinalHash)
-            delete(fullfile(dm.Datastore,[entry.FinalHash{i} '.mat']))
+            delete(fullfile(dm.getDatastore,[entry.FinalHash{i} '.mat']))
         end
         
         %Remove Entry from directory
@@ -18,6 +18,9 @@ function removeEntry(dm,varargin)
         for i = 1:length(vars)
             dm.mDir.(vars{i})(index) = [];
         end
+        
+        %Save Directory
+        dm.SaveDirectory;
     end
     
     
