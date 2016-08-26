@@ -15,7 +15,11 @@ classdef Datamaster < handle
     end
     
     methods
+        %% Class Constructor
         function obj = Datamaster()
+            %Report Current Version info
+            reportGitInfo;
+            
             %Set Relavant Locations
             obj.Datastore = 'C:\Users\Alex\OneDrive\ARG17\Datamaster\Datastore\';
             obj.mDirLoc = fullfile(obj.Datastore,'mDir.mat');
@@ -37,6 +41,7 @@ classdef Datamaster < handle
                 'Details',...       %Copy of the Datastore's Details
                 'Parameters'};      %List of Parameters logged
             
+            % Check Required Variables Exist
             for i = 1:length(req_Vars)
                 %Check if required variable exist
                 checksum = sum(strcmp(req_Vars{i},Existing_Vars));
@@ -57,6 +62,7 @@ classdef Datamaster < handle
             
         end
         
+        %% Small Public Methods -> Move externally if it grows
         function DatastorePath = getDatastore(obj)
             %Returns the Full Path to the Datastore
             DatastorePath = obj.Datastore;

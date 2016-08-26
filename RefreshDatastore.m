@@ -1,4 +1,5 @@
 %Script to Check for New Log files and Export them to the Datastore
+clc
 
 %Create MoTeC COM Server
 i2 = actxserver('MoTeC.i2Application');
@@ -13,12 +14,13 @@ baseDir = 'C:\Users\Alex\Google Drive\ADL3 Data';
 %Setup input Stuct
 s.dir = 'C:\Users\Alex\Google Drive\ADL3 Data';
 s.i2 = i2;
+
+fprintf('Accessing Datamaster\n')
 s.Datamaster = Datamaster();
 
 %Set Up Console
 startTime = tic;
-clc
-fprintf('Searching for New MoTeC Log Files...\n');
+fprintf('\nSearching for New MoTeC Log Files...\n');
 
 % Start Search
 stats = RecursivelyOpen(s);
@@ -45,3 +47,5 @@ end
 fprintf('\n')
 toc(startTime);
 
+%Get Git Version and report
+reportGitInfo;
