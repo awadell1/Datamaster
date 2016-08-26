@@ -58,8 +58,7 @@ classdef Datamaster < handle
                     %manually recovered
                     error('Master Directory Corrupted')
                 end
-            end
-            
+            end            
         end
         
         %% Small Public Methods -> Move externally if it grows
@@ -67,7 +66,7 @@ classdef Datamaster < handle
             %Returns the Full Path to the Datastore
             DatastorePath = obj.Datastore;
         end
-
+        
         function delete(obj)
             %Method for deleteing Datamaster Object
             
@@ -77,24 +76,26 @@ classdef Datamaster < handle
     end
     
     %% Function Signitures for Public Methods
-        methods (Access = public)
-            [status,OriginHash] = CheckLogFileStatus(obj,LogFileLoc)
-            
-            FinalHash = addDatasource(obj,Origin,DatasourceLoc,Details)
-            
-            addEntry(obj,Origin,OriginHash,FinalHash,Details,Parameters)
-            
-            Datasource = getDatasource(obj,varargin)
-            
-            [Entry,index] = getEntry(obj,varargin)
-            
-            removeEntry(obj,varagin)
-            
-            Cleanup(obj)
-            
-            SaveDirectory(obj)
-            
-        end
+    methods (Access = public)
+        [status,OriginHash] = CheckLogFileStatus(obj,LogFileLoc)
         
+        FinalHash = addDatasource(obj,Origin,DatasourceLoc,Details)
+        
+        addEntry(obj,Origin,OriginHash,FinalHash,Details,Parameters)
+        
+        Datasource = getDatasource(obj,varargin)
+        
+        [Entry,index] = getEntry(obj,varargin)
+        
+        removeEntry(obj,varagin)
+        
+        Cleanup(obj)
+        
+        SaveDirectory(obj)
+        
+        checkAllDatasourcesExist(dm)
+        
+    end
+    
 end
 

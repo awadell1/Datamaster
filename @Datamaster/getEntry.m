@@ -14,6 +14,9 @@ function [entry, index] = getEntry(dm,varargin)
     parse(p,dm,varargin{:});
     in = p.Results;
     
+    %Initalize outputs
+    entry = {}; index = {};
+    
     if ~strcmp(in.Hash,'')
         %Return Database enteries for that contain the supplied hash
         
