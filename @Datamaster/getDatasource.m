@@ -1,23 +1,25 @@
-function [datasource,entry] = getDatasource(dm,varargin)
+function ds = getDatasource(dm,varargin)
     %Function to handle extracting a datasource from Datamaster
     
     %Get Enteries for requested datasource
     entry = dm.getEntry(varargin{:});
     
     %Access requested datasources
-    if length(entry.FinalHash) == 1
+    if ~isa(entry.FinalHash,'cell')
         %Only One Datasource Requested -> Return struct
-        datasource = LoadDatasource(dm,entry.FinalHash);
+        ds = datasource(dm,entry);
     else
         %Multiple datasources requested -> Return Cell array
-        datasource = cell(1,length(entry.FinalHash));
+        ds = cell(1,length(entry.FinalHash));
         for i = 1:length(entry.FinalHash)
-            datasource{i} = LoadDatasource(dm,entry.FinalHash{i});
+            ds{i} = datasource(dm,indexSubCell(entry,i));
         end
     end
 end
 
-function datasource = LoadDatasource(dm,FinalHash)
-    %Function to handle reading in a datastore .mat file
-    datasource = load(fullfile(dm.Datastore,[FinalHash '.mat']));
+function s2 = indexSubCell(s1,index)
+    vars = fieldnames(s1);
+    for i = 1:length(vars)
+        s2.(vars{i}) = s1.(vars{i}){index};
+    end
 end

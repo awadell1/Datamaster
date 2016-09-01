@@ -73,6 +73,11 @@ classdef Datamaster < handle
             %Save Current Directory
             obj.SaveDirectory;
         end
+        
+        function num = numEnteries(dm)
+            %Returns the number of Datasources stored in the Datastore
+            num = length(dm.mDir.FinalHash)
+        end
     end
     
     %% Function Signitures for Public Methods
