@@ -26,39 +26,11 @@ classdef Datamaster < handle
             
             %Connect to the Directory
             if exist(obj.mDirLoc,'file')
-                obj.mDir = load(obj.mDirLoc);
-                
-                %Ensure all Required Variables have been created
-                Existing_Vars = fieldnames(obj.mDir);
+                load(obj.mDirLoc); obj.mDir = mDir;
             else
-                Existing_Vars = {''};
-            end
-            
-            %Set Required Variables
-            req_Vars = {'Origin',....       %Relative Path from \Google Drive\
-                'OriginHash',...    %Hash of the origin .ld file
-                'FinalHash',...     %Hash of the Datastore
-                'Details',...       %Copy of the Datastore's Details
-                'Parameters'};      %List of Parameters logged
-            
-            % Check Required Variables Exist
-            for i = 1:length(req_Vars)
-                %Check if required variable exist
-                checksum = sum(strcmp(req_Vars{i},Existing_Vars));
-                if checksum == 1
-                    %Matfile Contains exactly one copy of the required
-                    %variable
-                    
-                elseif checksum < 1
-                    %Mat file is missing required variable -> Create
-                    obj.mDir.(req_Vars{i}) = {};
-                else
-                    %Multiple compies of a required varaiable exist ->
-                    %Directory has been corupted and will need to be
-                    %manually recovered
-                    error('Master Directory Corrupted')
-                end
-            end            
+                obj.mDir = struct('Origin',{},'OriginHash',{},'FinalHash',{},...
+                    'Details',{},'Parameters',{});
+            end        
         end
         
         %% Small Public Methods -> Move externally if it grows
@@ -76,7 +48,7 @@ classdef Datamaster < handle
         
         function num = numEnteries(dm)
             %Returns the number of Datasources stored in the Datastore
-            num = length(dm.mDir.FinalHash)
+            num = size(dm.mDir,2);
         end
     end
     

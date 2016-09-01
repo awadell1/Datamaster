@@ -5,13 +5,13 @@ function [status,OriginHash] = CheckLogFileStatus(obj,LogFileLoc)
     OriginHash = DataHash(LogFileLoc,obj.HashOptions);
     
     %Compare OriginHash to MasterDatabase
-    OriginMatch = strcmp(OriginHash,obj.mDir.OriginHash);
+    OriginMatch = strcmp(OriginHash,{obj.mDir.OriginHash});
     
     %Trim LogFileLoc to sub \Google Drive\
     RelPath = strfind(LogFileLoc,'\Google Drive\');
     RelPath = LogFileLoc(RelPath:end);
     
-    PathMatch = strcmp(RelPath,obj.mDir.Origin);
+    PathMatch = strcmp(RelPath,{obj.mDir.Origin});
     
     %Detirmine Status of Log File
     if sum(OriginMatch) <= 1 && sum(PathMatch) <= 1

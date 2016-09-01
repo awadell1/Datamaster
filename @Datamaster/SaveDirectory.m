@@ -1,11 +1,15 @@
-function SaveDirectory(obj)
+function SaveDirectory(dm)
     %Overwrite the saved Master Directory with the in memory one
     
-    %Get in-memory directory
-    saveVars = obj.mDir;
+    %Grab Master Directory
+    mDir = dm.mDir;
     
     %Save in-memory directory
-    fileattrib(obj.mDirLoc,'+w');   %Enable Write access
-    save(obj.mDirLoc,'-struct','saveVars'); %Save
-    fileattrib(obj.mDirLoc,'-w')    %Disable Write access
+    if exist(dm.mDirLoc,'file')
+        fileattrib(dm.mDirLoc,'+w');   %Enable Write access
+        save(dm.mDirLoc,'mDir'); %Save
+        fileattrib(dm.mDirLoc,'-w')    %Disable Write access
+    else
+        save(dm.mDirLoc,'mDir'); %Save
+    end
 end

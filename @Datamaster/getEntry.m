@@ -26,9 +26,9 @@ function [entry, index] = getEntry(dm,varargin)
         end
         
         %Find Entry
-        index = zeros(1,length(dm.mDir.OriginHash));
+        index = zeros(1,dm.numEnteries);
         for i = 1:length(in.Hash)
-            cur_index = strcmp(in.Hash{i},dm.mDir.OriginHash) | strcmp(in.Hash{i},dm.mDir.FinalHash);
+            cur_index = strcmp(in.Hash{i},{dm.mDir.OriginHash}) | strcmp(in.Hash{i},{dm.mDir.FinalHash});
             
             %Check if multiple entries matched -> May indicated duplication in
             %the directory
@@ -40,16 +40,12 @@ function [entry, index] = getEntry(dm,varargin)
             index = cur_index | index;
         end
         
-        %Return Entry to User
-        vars = fieldnames(dm.mDir);
-        for i = 1:length(vars)
-            entry.(vars{i}) = dm.mDir.(vars{i})(index);
-        end
-        
     elseif nargin == 1
-        %Return entire Directory
-        entry = dm.mDir;
-        index = ones(1,length(dm.mDir.FinalHash));
+        index = ones(1,dm.numEnteries);
     end
+    
+    %Return Entry to User
+    entry = dm.mDir(index);
+    
     
 end

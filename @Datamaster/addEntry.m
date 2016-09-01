@@ -1,18 +1,18 @@
-function addEntry(obj,Origin,OriginHash,FinalHash,Details,Parameters)
+function addEntry(dm,Origin,OriginHash,FinalHash,Details,Parameters)
     
     %Get Index of new directory Entry
-    Index = length(obj.mDir.Origin)+1;
+    Index = dm.numEnteries +1;
     
     %Trim Origin to \Google Drive\
     PathStart = strfind(Origin,'\Google Drive\');
     Origin = Origin(PathStart:end);
     
-    obj.mDir.Origin{Index} = Origin;
-    obj.mDir.OriginHash{Index} = OriginHash;
-    obj.mDir.FinalHash{Index} = FinalHash;
-    obj.mDir.Details{Index} = Details;
-    obj.mDir.Parameters{Index} = Parameters;
+    dm.mDir(Index).Origin = Origin;
+    dm.mDir(Index).OriginHash = OriginHash;
+    dm.mDir(Index).FinalHash = FinalHash;
+    dm.mDir(Index).Details = Details;
+    dm.mDir(Index).Parameters = Parameters;
     
     %Update the Master Directory
-    SaveDirectory(obj)
+    SaveDirectory(dm)
 end
