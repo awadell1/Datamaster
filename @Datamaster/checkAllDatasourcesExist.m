@@ -20,9 +20,9 @@ function checkAllDatasourcesExist(dm)
     names(rmIndex) = [];
     
     %Check if each entry has a datasource.mat file
-    rmIndex = false(1,length(dm.mDir.FinalHash));
-    for i = 1:length(dm.mDir.FinalHash)
-        FileExist = any(strcmp(dm.mDir.FinalHash{i},names));
+    rmIndex = false(1,size(dm.mDir,2));
+    for i = 1:size(dm.mDir,2)
+        FileExist = any(strcmp(dm.mDir(i).FinalHash,names));
         
         if ~FileExist
             %Mark for deletion
@@ -31,5 +31,5 @@ function checkAllDatasourcesExist(dm)
     end
     
     %Remove enteries with missing datasources
-    dm.removeEntry(dm.mDir.FinalHash(rmIndex));
+    dm.removeEntry(dm.mDir(rmIndex).FinalHash);
 end

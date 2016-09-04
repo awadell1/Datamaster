@@ -5,6 +5,7 @@ function ds = getDatasource(dm,varargin)
     entry = dm.getEntry(varargin{:});
     
     %Access requested datasources
+    ds = datasource.empty(0,length(entry));
     for i = 1:length(entry)
         ds(i) = datasource(dm,entry(i));
     end

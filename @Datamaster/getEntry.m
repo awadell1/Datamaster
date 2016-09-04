@@ -2,21 +2,18 @@ function [entry, index] = getEntry(dm,varargin)
     %Function to retrieve directory entries from Datamaster
     
     %Create Persistent Input Parser to handle reading inputs
-    %persistent p
-    %if isempty(p)
+    persistent p
+    if isempty(p)
     p = inputParser;
     p.FunctionName = 'getEntry';
     addRequired(p,'obj',@(x) isa(x,'Datamaster'));
     addOptional(p,'Hash','',@validateHash);
-    %end
+    end
     
     %Parse Inputs
     parse(p,dm,varargin{:});
     in = p.Results;
-    
-    %Initalize outputs
-    entry = {}; index = {};
-    
+
     if ~strcmp(in.Hash,'')
         %Return Database enteries for that contain the supplied hash
         
@@ -26,7 +23,7 @@ function [entry, index] = getEntry(dm,varargin)
         end
         
         %Find Entry
-        index = zeros(1,dm.numEnteries);
+        index = false(1,dm.numEnteries);
         for i = 1:length(in.Hash)
             cur_index = strcmp(in.Hash{i},{dm.mDir.OriginHash}) | strcmp(in.Hash{i},{dm.mDir.FinalHash});
             
@@ -41,11 +38,9 @@ function [entry, index] = getEntry(dm,varargin)
         end
         
     elseif nargin == 1
-        index = ones(1,dm.numEnteries);
+        index = true(1,dm.numEnteries);
     end
     
     %Return Entry to User
     entry = dm.mDir(index);
-    
-    
 end
