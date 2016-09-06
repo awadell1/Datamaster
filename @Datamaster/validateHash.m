@@ -8,7 +8,7 @@ function valid = validateHash(dm, hash)
             %Check that each hash in the cell array is valid
             i = 1;
             while i < length(hash) && valid
-                valid = validateHash(hash{i}) && valid;
+                valid = dm.validateHash(hash{i}) && valid;
                 i = i+1;
             end
         case 'char'
@@ -18,7 +18,7 @@ function valid = validateHash(dm, hash)
             end
             
             %Valid Hashes Exist have enteries in the Master Directory
-            if ~any(strcmp(hash,[{dm.mDir.OriginHash} {''}]) | strcmp(hash,[{dm.mDir.FinalHash} {''}]))
+            if ~any(strcmp(hash,{dm.mDir.OriginHash}) | strcmp(hash,{dm.mDir.FinalHash}))
                 valid = false;
             end
     end

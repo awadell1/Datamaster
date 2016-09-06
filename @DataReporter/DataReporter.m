@@ -18,7 +18,7 @@ classdef DataReporter
         %% Function Signitures
         stats = RefreshDatastore(dr)
         
-        checkDetails(dr);
+        checkDetails(dr,hash);
     end
     
     methods(Static)

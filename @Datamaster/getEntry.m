@@ -4,16 +4,16 @@ function [entry, index] = getEntry(dm,varargin)
     %Create Persistent Input Parser to handle reading inputs
     persistent p
     if isempty(p)
-    p = inputParser;
-    p.FunctionName = 'getEntry';
-    addRequired(p,'obj',@(x) isa(x,'Datamaster'));
-    addOptional(p,'Hash','',@(x) validateHash(dm,x));
+        p = inputParser;
+        p.FunctionName = 'getEntry';
+        addRequired(p,'obj',@(x) isa(x,'Datamaster'));
+        addOptional(p,'Hash','',@(x) dm.validateHash(x));
     end
     
     %Parse Inputs
     parse(p,dm,varargin{:});
     in = p.Results;
-
+    
     if ~strcmp(in.Hash,'')
         %Return Database enteries for that contain the supplied hash
         
@@ -25,7 +25,7 @@ function [entry, index] = getEntry(dm,varargin)
         %Find Entry
         index = false(1,dm.numEnteries);
         for i = 1:length(in.Hash)
-            cur_index = strcmp(in.Hash{i},[{dm.mDir.OriginHash} {''}]) | strcmp(in.Hash{i},[{dm.mDir.FinalHash} {''}]);
+            cur_index = strcmp(in.Hash{i},{dm.mDir.OriginHash}) | strcmp(in.Hash{i},{dm.mDir.FinalHash});
             
             %Check if multiple entries matched -> May indicated duplication in
             %the directory
@@ -34,7 +34,9 @@ function [entry, index] = getEntry(dm,varargin)
             end
             
             %Combine with prior results
-            index = cur_index | index;
+            if ~isempty(cur_index)
+                index = cur_index | index;
+            end
         end
         
     elseif nargin == 1
