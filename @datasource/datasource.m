@@ -21,29 +21,38 @@ classdef datasource < handle
         
         %Access Methods
         function channels = getLogged(ds)
-           channels = ds.Entry.Parameters(:);
+            channels = ds.Entry.Parameters(:);
         end
         
+        function detail = getDetails(ds,Detail)
+            detail = ds.Entry.Details.(Detail);
+        end
+        
+        function clearData(ds)
+            %Clear Loaded Data from memory
+            ds.Data = [];
+        end
         %Public Function Signitures
         channel = getChannel(ds,chanName)
         
-        TimePlot(ds,chanName)
+        TimePlot(ds,varargin)
     end
     
     methods (Access = public)
         function loadChannels(ds,channelNames)
-            %Load New Channels
-            if isa(channelNames,'cell')
-                newData = load(ds.MatPath,channelNames{:});
-            else
-                newData = load(ds.MatPath,channelNames);
-            end
-            
-            
-            %Append to Data
-            vars = fieldnames(newData);
-            for i = 1:length(vars)
-                ds.Data.(vars{i}) = newData.(vars{i});
+            for i = 1:length(ds)
+                %Load New Channels
+                if isa(channelNames,'cell')
+                    newData = load(ds(i).MatPath,channelNames{:});
+                else
+                    newData = load(ds(i).MatPath,channelNames);
+                end
+                
+                %Append to Data
+                vars = fieldnames(newData);
+                for j = 1:length(vars)
+                    ds(i).Data.(vars{j}) = newData.(vars{j});
+                end
             end
         end
     end

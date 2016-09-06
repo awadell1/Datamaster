@@ -2,6 +2,7 @@ function channel = getChannel(ds,chanName)
     
     %Validate Channel Names
     assert(validateChannel(ds,chanName),'Invalid Channel Name');
+    assert(size(ds,2) == 1, 'ds must be a single datasource object');
     
     if isa(chanName,'cell')
         for i = 1:length(chanName)
