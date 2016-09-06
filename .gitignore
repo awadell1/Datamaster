@@ -1,3 +1,6 @@
 Datastore/
 *.asv
 *.mat
+
+#Ignore html folder
+html/

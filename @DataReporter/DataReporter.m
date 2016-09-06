@@ -21,7 +21,7 @@ classdef DataReporter
         checkDetails(dr,hash);
     end
     
-    methods(Static)
+    methods(Static, Access = private)
         stats = RecursivelyOpen(s)
         [success,FinalHash] = ExportDatasource(dataSource,s)
     end
