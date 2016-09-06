@@ -72,6 +72,8 @@ classdef Datamaster < handle
         
         checkAllDatasourcesExist(dm)
         
+        valid = validateHash(dm, hash)
+        
     end
     
 end
