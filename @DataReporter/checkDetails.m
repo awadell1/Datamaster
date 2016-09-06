@@ -29,7 +29,7 @@ function checkDetails(dr,hash)
 		fprintf('\t%s: ''%s''\n','Vehicle ID',ds(i).getDetails('VehicleID'));
 
 		%% Validate Driver -> Must be a NetID
-		Error(i) = Error(i)	+ RegExpTester(ds(i),'Driver','^([a-z]{2,3}\d+)$');
+		Error(i) = Error(i)	+ RegExpTester(ds(i),'Driver','^(([a-z]{2,3}\d+)\s*)+$');
 
 		%% Validate Session -> Subteam ID + netid
 		AllowedEvent = {'DRIVE', 'DYNO', 'FLOW', 'AERO', 'ERGO', 'UNSPRUNG', 'DTRAIN' };	%Cell Array of Allowed Subteam ID's

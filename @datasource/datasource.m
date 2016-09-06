@@ -28,6 +28,10 @@ classdef datasource < handle
             detail = ds.dm.getEntry(ds.FinalHash).Details.(Detail);
         end
         
+        function entry = Entry(ds)
+            entry = ds.dm.getEntry(ds.FinalHash);
+        end
+        
         function clearData(ds)
             %Clear Loaded Data from memory
             ds.Data = [];
@@ -36,6 +40,8 @@ classdef datasource < handle
         channel = getChannel(ds,chanName)
         
         TimePlot(ds,varargin)
+        
+        openInMoTeC(ds)
     end
     
     methods (Access = public)
