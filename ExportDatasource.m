@@ -11,7 +11,7 @@ function [success,FinalHash] = ExportDatasource(dataSource,s)
         %Create .mat file for i2Pro to save over -> Use a random filename
         %to prevent lockouts.
         %Created Early to ensure file is free when needed
-        saveFile = sprintf('temp_%.f.mat',1e3*rand);
+        saveFile = sprintf('temp_%.f.mat',1e10*rand);
         saveFile = fullfile(fileparts(s.Datamaster.getDatastore),saveFile);
         save(saveFile,'saveFile');
         
@@ -108,7 +108,7 @@ function paste = PasteText()
             nTry = maxTries;
         catch
             %Wait a bit then try again
-            warning('\nCopying Failed -> Trying Again'); pause(0.1*2^nTry);
+            pause(0.1*2^nTry);
             nTry = nTry +1;
             if maxTries == nTry
                 error('Copying Failed -> ')

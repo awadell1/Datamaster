@@ -17,6 +17,8 @@ s.i2 = i2;
 
 fprintf('Accessing Datamaster\n')
 s.Datamaster = Datamaster();
+s.Datamaster.Cleanup();
+s.Datamaster.checkAllDatasourcesExist;
 
 %Set Up Console
 startTime = tic;
