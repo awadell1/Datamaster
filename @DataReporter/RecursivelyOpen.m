@@ -46,7 +46,7 @@ function stats = RecursivelyOpen(s)
                 nS.dir = itemLoc;
                 
                 %Search Child Directory
-                nStats = RecursivelyOpen(nS);
+                nStats = DataReporter.RecursivelyOpen(nS);
                 
                 %Add sub directory count to running count
                 vars = fieldnames(stats);
@@ -68,7 +68,7 @@ function stats = RecursivelyOpen(s)
                     switch CheckLogFileStatus(s.Datamaster,itemLoc)
                         case 'new'
                             %New Data source -> Export
-                            [success, FinalHash] = ExportDatasource(itemLoc,s);
+                            [success, FinalHash] = DataReporter.ExportDatasource(itemLoc,s);
                             
                             %Check if export was successful
                             if success

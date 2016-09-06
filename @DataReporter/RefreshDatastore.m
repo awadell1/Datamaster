@@ -1,31 +1,36 @@
-%Script to Check for New Log files and Export them to the Datastore
-clc
-
-%Create MoTeC COM Server
-i2 = actxserver('MoTeC.i2Application');
-i2.Visible = 1;
-pause(1);   %Wait for MoTeC to Open
+function stats = RefreshDatastore(dr)
+    %Searches the ADL3 Data Folder on Google Drive for any new MoTeC Log
+    %Files. New Log Files are then exported and added to the Datastore by
+    %Datamaster. 
+    %Also records summary satistics such as number of new, modified and
+    %corrupt log files currently on the Google Drive.
+    %Returns a cell array containg the OriginHashes of all newly exported
+    %Log Files
 
 %Top Level Directory
-baseDir = 'C:\Users\Alex\Google Drive\ADL3 Data';
+%baseDir = 'C:\Users\Alex\Google Drive\ADL3 Data';
 
 %% Recursivly Search for New Log Files
 
-%Setup input Stuct
-s.dir = 'C:\Users\Alex\Google Drive\ADL3 Data';
-s.i2 = i2;
+%% Setup input Stuct
 
-fprintf('Accessing Datamaster\n')
-s.Datamaster = Datamaster();
-s.Datamaster.Cleanup();
-s.Datamaster.checkAllDatasourcesExist;
+%Top Level Directory
+s.dir = 'C:\Users\Alex\Google Drive\ADL3 Data';
+
+%Create MoTeC COM Server
+s.i2 = actxserver('MoTeC.i2Application');
+s.i2.Visible = 1;
+pause(1);   %Wait for MoTeC to Open
+
+%Pull Datamaster handle from DataReporter
+s.Datamaster = dr.dm;
 
 %Set Up Console
 startTime = tic;
 fprintf('\nSearching for New MoTeC Log Files...\n');
 
 % Start Search
-stats = RecursivelyOpen(s);
+stats = DataReporter.RecursivelyOpen(s);
 
 %Clean up Datastore
 s.Datamaster.Cleanup
