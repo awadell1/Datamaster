@@ -7,7 +7,7 @@ function [entry, index] = getEntry(dm,varargin)
     p = inputParser;
     p.FunctionName = 'getEntry';
     addRequired(p,'obj',@(x) isa(x,'Datamaster'));
-    addOptional(p,'Hash','',@validateHash);
+    addOptional(p,'Hash','',@(x) validateHash(dm,x));
     end
     
     %Parse Inputs
@@ -25,7 +25,7 @@ function [entry, index] = getEntry(dm,varargin)
         %Find Entry
         index = false(1,dm.numEnteries);
         for i = 1:length(in.Hash)
-            cur_index = strcmp(in.Hash{i},{dm.mDir.OriginHash}) | strcmp(in.Hash{i},{dm.mDir.FinalHash});
+            cur_index = strcmp(in.Hash{i},[{dm.mDir.OriginHash} {''}]) | strcmp(in.Hash{i},[{dm.mDir.FinalHash} {''}]);
             
             %Check if multiple entries matched -> May indicated duplication in
             %the directory
