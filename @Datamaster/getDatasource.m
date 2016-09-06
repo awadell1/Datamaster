@@ -7,6 +7,6 @@ function ds = getDatasource(dm,varargin)
     %Access requested datasources
     ds = datasource.empty(0,length(entry));
     for i = 1:length(entry)
-        ds(i) = datasource(dm,entry(i));
+        ds(i) = datasource(dm,entry(i).FinalHash);
     end
 end

@@ -2,7 +2,7 @@ classdef datasource < handle
     %Class for structing MoTeC Log Data and supporting documentation
     
     properties (Access = public)
-        Entry = [];         %Datastore Entry
+        FinalHash = [];         %Final Hash of the datasource
         Data = struct;          %Stucture of Logged Data
         %
     end
@@ -12,20 +12,20 @@ classdef datasource < handle
     end
     
     methods
-        function obj = datasource(dm,Entry)
+        function obj = datasource(dm,FinalHash)
             obj.dm = dm;
-            obj.Entry = Entry;
+            obj.FinalHash = FinalHash;
             
-            obj.MatPath = fullfile(dm.getDatastore,[Entry.FinalHash '.mat']);
+            obj.MatPath = fullfile(dm.getDatastore,[FinalHash '.mat']);
         end
         
         %Access Methods
         function channels = getLogged(ds)
-            channels = ds.Entry.Parameters(:);
+            channels = ds.dm.getEntry(ds.FinalHash).Parameters(:);
         end
         
         function detail = getDetails(ds,Detail)
-            detail = ds.Entry.Details.(Detail);
+            detail = ds.dm.getEntry(ds.FinalHash).Details.(Detail);
         end
         
         function clearData(ds)
