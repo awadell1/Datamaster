@@ -10,7 +10,7 @@ function checkDetails(dr,hash)
     for i = 1:length(ds)
     	%%Report Current Log File
     	fprintf('Logged Date: %s\n',datestr(ds(i).getDetails('Datetime')))
-    	fprintf('Final Hash: %s\n',ds(i).Entry.OriginHash);
+    	fprintf('Origin Hash: %s\n',ds(i).Entry.OriginHash);
         
         %% Validate Event
         Error(i) = Error(i) + SelectionField(ds(i),'Event',...

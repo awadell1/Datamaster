@@ -23,7 +23,7 @@ function [success,FinalHash] = ExportDatasource(dataSource,s)
         h = actxserver('WScript.Shell');
         
         %Active the MoTeC App
-        h.AppActivate('Engine 1'); pause(.01);
+        h.AppActivate('Circuit 1'); pause(.01);
         
         %Baseline Delay
         delay = 0.02;
@@ -36,14 +36,15 @@ function [success,FinalHash] = ExportDatasource(dataSource,s)
         pause(0.05)
         
         %Loop over Text boxes and Store
-        details = cell(1,17);
-        for i = 1:10
-            system('echo off | clip');          %Clear the clipboard
-            h.SendKeys('^a'); pause(delay);     %Select Textbox
-            h.SendKeys('^c'); pause(delay);     %Copy Textbox
-            
-            details{i} = PasteText();
-            
+        details = cell(1,13);
+        for i = 1:13
+            if i ~= 4
+                system('echo off | clip');          %Clear the clipboard
+                h.SendKeys('^a'); pause(delay);     %Select Textbox
+                h.SendKeys('^c'); pause(delay);     %Copy Textbox
+                
+                details{i} = PasteText();
+            end
             h.SendKeys('{TAB}'); pause(delay);  %Move to Next Textbox
         end
         
@@ -52,16 +53,18 @@ function [success,FinalHash] = ExportDatasource(dataSource,s)
         h.SendKeys('{ESC}'); pause(delay);
         
         %Save Details
-        Details.Event = details{1};
-        Details.Venue = details{2};
-        Details.Driver = details{3};
-        Details.VehicleID = details{4};
-        Details.VehicleNumber = details{5};
-        Details.VehicleDesc = details{6};
-        Details.EngineID = details{7};
-        Details.Session = details{8};
-        Details.Short = details{9};
-        Details.Long = details{10};
+        Details.Event            = details{1};
+        Details.Venue            = details{2};
+        Details.Length           = details{3};
+        Details.Driver           = details{5};
+        Details.VehicleID        = details{6};
+        Details.VehicleNumber    = details{7};
+        Details.VehicleDesc      = details{8};
+        Details.EngineID         = details{9};
+        Details.Session          = details{10};
+        Details.StartLap         = details{11};
+        Details.Short            = details{12};
+        Details.Long             = details{13};
         
         %Get Creation date for Datasource
         date = dir(dataSource); date = datetime(date.date);

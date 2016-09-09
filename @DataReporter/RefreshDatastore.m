@@ -14,8 +14,18 @@ function stats = RefreshDatastore(dr)
 
 %% Setup input Stuct
 
-%Top Level Directory
-s.dir = 'C:\Users\Alex\Google Drive\ADL3 Data';
+ %Assert that the host computer is a pc
+assert(ispc,'Only a pc can export MoTeC Log files')
+
+% Top Level Directory
+s.dir = [getenv('userprofile') '\Google Drive\ADL3 Data'];
+
+% Get Location of Google Drive if guessed wrong
+if ~exist(s.dir)
+    s.dir = uigetdir('','Open the ADL3 Data Folder');
+end
+
+assert(ischar(s.dir) && exist(s.dir),'Could Not Find the ADL3 Folder');
 
 %Create MoTeC COM Server
 s.i2 = actxserver('MoTeC.i2Application');

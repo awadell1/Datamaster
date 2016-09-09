@@ -1,6 +1,6 @@
 %Refresh the Databases
-%dr = DataReporter;
-%dr.RefreshDatastore
+dr = DataReporter;
+dr.RefreshDatastore
 
 %Publish Report
 reportFile = publish('Report.m','stylesheet','ReportStyle.xsl',...

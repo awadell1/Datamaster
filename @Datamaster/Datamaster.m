@@ -5,13 +5,13 @@ classdef Datamaster < handle
     
     properties (Access = private)
         mDir = struct;             %Handle to the mat file storing information on all datasources
-        Datastore = nan;        %Location of the Datastore
-        mDirLoc = nan;          %Location of the master directory
+        Datastore = nan;           %Location of the Datastore
+        mDirLoc = nan;             %Location of the master directory
         
         %Hashing Settings
         HashOptions = struct('Method','SHA-256',...
-            'Format','hex',...
-            'Input','file');
+                             'Format','hex',...
+                             'Input','file');
     end
     
     methods
