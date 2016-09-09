@@ -1,30 +1,45 @@
 function [entry, index] = getEntry(dm,varargin)
     %Function to retrieve directory entries from Datamaster
     
+
+    %Define avaiable Fieldnames on the MoTeC Detail Panel
+    fieldNames =  {'Event','Venue','Length','Driver','VehicleID','VehicleNumber',...
+                       'VehicleDesc','EngineID','Session','StartLap','Short','Long'};
+
     %Create Persistent Input Parser to handle reading inputs
     persistent p
-    if isempty(p)
+    if isempty(p) || true
         p = inputParser;
         p.FunctionName = 'getEntry';
         addRequired(p,'obj',@(x) isa(x,'Datamaster'));
         addOptional(p,'Hash','',@(x) dm.validateHash(x));
-        addParameter(p,'Driver',    [],     @(x) ischar(x) || iscell(x));
-        addParameter(p,'Event',     [],     @(x) ischar(x) || iscell(x));
-        addParameter(p,'Venue',     [],     @(x) ischar(x) || iscell(x));
-        addParameter(p,'Short',     [],     @(x) ischar(x) || iscell(x));
+
+        %Add a Parameter for Each fieldname
+        for i = 1:length(fieldNames)
+            addParameter(p,fieldNames{i},    [],     @(x) ischar(x) || iscell(x));
+        end
+
+        % Add Parameter to search by channel
+        addParameter(p,'channel',   [],     @(x) ischar(x) || iscell(x));
+
+        % Add a Parameter to a date range of intererst
         addParameter(p,'StartDate', [],     @(x) isa(x,'datetime') && length(x) == 1);
         addParameter(p,'EndDate',   [],     @(x) isa(x,'datetime') && length(x) == 1);
+
+        % Add Parameters to control how many results are returned
+        addParameter(p,'Return',    [],         @isfloat);
+        addParameter(p,'Sort',      'newest',   @ischar);
     end
     
     %Parse Inputs and expand to vectors
     parse(p,dm,varargin{:});
     Hash = p.Results.Hash;
-    Driver = p.Results.Driver;
-    Event = p.Results.Event;
-    Venue = p.Results.Venue;
-    Short = p.Results.Short;
+    channel = p.Results.channel;
     StartDate = p.Results.StartDate;
     EndDate = p.Results.EndDate;
+    
+    %Grab the Details List
+    Details = [dm.mDir.Details];
     
     if nargin == 1
         index = true(1,dm.numEnteries);
@@ -52,32 +67,18 @@ function [entry, index] = getEntry(dm,varargin)
                 index = cur_index | index;
             end
         end
-    else
-        %Search by Request
-        Details = [dm.mDir.Details];
-        Parameters = {dm.mDir.Parameters};
+    else %Search by Request
         
         %Match Index -> Assume Match Until Not a Match
         index = true(1,dm.numEnteries);
-        
-        %% Search for Driver
-        if ~isempty(Driver)
-            index = index & FieldMatch(Details,index,'Driver',Driver);
-        end
-        
-        %% Search for Event
-        if ~isempty(Event)
-            index = index & FieldMatch(Details,index,'Event',Event);
-        end
 
-        %% Search for Venue
-        if ~isempty(Venue)
-            index = index & FieldMatch(Details,index,'Venue',Venue);
-        end
-
-        %% Search for Short
-        if ~isempty(Short)
-            index = index & FieldMatch(Details,index,'Short',Short);
+        %% Search in Field
+        % Check if a search has been requested for each field
+        for i = 1:length(fieldNames)
+            if ~isempty(p.Results.(fieldNames{i}))
+                % Search Field for Requested String
+                index = index & FieldMatch(Details,index,fieldNames{i},p.Results.(fieldNames{i}));
+            end
         end
 
         %% Search for Date Range
@@ -88,9 +89,38 @@ function [entry, index] = getEntry(dm,varargin)
         elseif ~isempty(EndDate)
             index = index & ([Details.Datetime] <= EndDate);
         end
+
+        %% Search by Parameters
+        if ~isempty(channel)
+            Parameters = {dm.mDir.Parameters};
+            index = index & cellfun(@(x) any(strcmpi(x,channel)),Parameters);
+        end
     end
     
-    %Return Entry to User
+    %% Sort the Results
+    switch p.Results.Sort
+        case 'newest'
+            % Sort Newest to Oldest
+            [~,sortIndex] = sort([Details.Datetime],'ascend');
+        case 'oldest'
+            %Sort Oldest to Newest
+            [~,sortIndex] = sort([Details.Datetime],'descend');
+        case 'rand'
+            sortIndex = floor(rand*length(index))+1;
+        otherwise
+            error('Unrecognized Sort Type');
+    end
+    
+    %Convert Logical to Order Indexing
+    index = sortIndex(index(sortIndex));
+    
+    %% Limit Number of Results
+    if ~isempty(p.Results.Return)
+        %Only return the first n enteries
+        index((p.Results.Return+1):end) = [];
+    end
+    
+    %% Return Entry to User
     entry = dm.mDir(index);
 end
 
