@@ -110,29 +110,32 @@ function [entry, index] = getEntry(dm,varargin)
         end
     end
     
-    %% Sort the Results
-    switch p.Results.Sort
-        case 'newest'
-            % Sort Newest to Oldest
-            [~,sortIndex] = sort([Details.Datetime],'ascend');
-        case 'oldest'
-            %Sort Oldest to Newest
-            [~,sortIndex] = sort([Details.Datetime],'descend');
-        case 'rand'
-            sortIndex = floor(rand*length(index))+1;
-        otherwise
-            error('Unrecognized Sort Type');
+    %Check if anything is returned before sorting
+    if ~isempty(index) && sum(index~=0)>0
+        %% Sort the Results
+        switch p.Results.Sort
+            case 'newest'
+                % Sort Newest to Oldest
+                [~,sortIndex] = sort([Details.Datetime],'ascend');
+            case 'oldest'
+                %Sort Oldest to Newest
+                [~,sortIndex] = sort([Details.Datetime],'descend');
+            case 'rand'
+                sortIndex = floor(rand*length(index))+1;
+            otherwise
+                error('Unrecognized Sort Type');
+        end
+        
+        %Convert Logical to Order Indexing
+        index = sortIndex(index(sortIndex));
+        
+        %% Limit Number of Results
+        if ~isempty(p.Results.Return)
+            %Only return the first n enteries
+            index((p.Results.Return+1):end) = [];
+        end
+        
     end
-    
-    %Convert Logical to Order Indexing
-    index = sortIndex(index(sortIndex));
-    
-    %% Limit Number of Results
-    if ~isempty(p.Results.Return)
-        %Only return the first n enteries
-        index((p.Results.Return+1):end) = [];
-    end
-    
     %% Return Entry to User
     entry = dm.mDir(index);
 end
