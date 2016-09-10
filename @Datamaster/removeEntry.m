@@ -5,7 +5,7 @@ function removeEntry(dm,varargin)
     
     if ~isempty(entry)
         %Verify action with user
-        prompt = sprintf('Are you sure you want to delete %d datasource(s)?\nThis action cannot be undone',sum(index));
+        prompt = sprintf('Are you sure you want to delete %d datasource(s)?\nThis action cannot be undone',sum(index ~= false));
         choice = questdlg(prompt,'Confirm Delete','Yes','No','No');
         
         if strcmp(choice,'Yes')

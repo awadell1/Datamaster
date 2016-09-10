@@ -1,11 +1,13 @@
 function [entry, index] = getEntry(dm,varargin)
     %Function to retrieve directory entries from Datamaster
+    %StartDate/EndData must be either a datetime or string of the format
+    %MM/dd/uuuu
     
-
+    
     %Define avaiable Fieldnames on the MoTeC Detail Panel
     fieldNames =  {'Event','Venue','Length','Driver','VehicleID','VehicleNumber',...
-                       'VehicleDesc','EngineID','Session','StartLap','Short','Long'};
-
+        'VehicleDesc','EngineID','Session','StartLap','Short','Long'};
+    
     %Create Persistent Input Parser to handle reading inputs
     persistent p
     if isempty(p) || true
@@ -13,19 +15,19 @@ function [entry, index] = getEntry(dm,varargin)
         p.FunctionName = 'getEntry';
         addRequired(p,'obj',@(x) isa(x,'Datamaster'));
         addOptional(p,'Hash','',@(x) dm.validateHash(x));
-
+        
         %Add a Parameter for Each fieldname
         for i = 1:length(fieldNames)
             addParameter(p,fieldNames{i},    [],     @(x) ischar(x) || iscell(x));
         end
-
+        
         % Add Parameter to search by channel
         addParameter(p,'channel',   [],     @(x) ischar(x) || iscell(x));
-
+        
         % Add a Parameter to a date range of intererst
-        addParameter(p,'StartDate', [],     @(x) isa(x,'datetime') && length(x) == 1);
-        addParameter(p,'EndDate',   [],     @(x) isa(x,'datetime') && length(x) == 1);
-
+        addParameter(p,'StartDate', [],     @(x) validateDate(x));
+        addParameter(p,'EndDate',   [],     @(x) validateDate(x));
+        
         % Add Parameters to control how many results are returned
         addParameter(p,'Return',    [],         @isfloat);
         addParameter(p,'Sort',      'newest',   @ischar);
@@ -71,7 +73,7 @@ function [entry, index] = getEntry(dm,varargin)
         
         %Match Index -> Assume Match Until Not a Match
         index = true(1,dm.numEnteries);
-
+        
         %% Search in Field
         % Check if a search has been requested for each field
         for i = 1:length(fieldNames)
@@ -80,16 +82,27 @@ function [entry, index] = getEntry(dm,varargin)
                 index = index & FieldMatch(Details,index,fieldNames{i},p.Results.(fieldNames{i}));
             end
         end
-
+        
         %% Search for Date Range
-        if ~isempty(StartDate) && ~isempty(EndDate)            
+        
+        %Convert to datetime if needed
+        warning('off','MATLAB:datetime:AmbiguousDateString');
+        if ischar(StartDate)
+            StartDate = datetime(StartDate,'format','MM/dd/uu');
+        end
+        if ischar(EndDate)
+            EndDate = datetime(EndDate,'format','MM/dd/uu');
+        end
+        warning('on','MATLAB:datetime:AmbiguousDateString');
+        
+        if ~isempty(StartDate) && ~isempty(EndDate)
             index = index & isbetween([Details.Datetime],StartDate,EndDate);
         elseif ~isempty(StartDate)
             index = index & ([Details.Datetime] >= StartDate);
         elseif ~isempty(EndDate)
             index = index & ([Details.Datetime] <= EndDate);
         end
-
+        
         %% Search by Parameters
         if ~isempty(channel)
             Parameters = {dm.mDir.Parameters};
@@ -126,7 +139,7 @@ end
 
 function index = FieldMatch(Details,index,Field,Options)
     %Check to see if the option string is in the field
-
+    
     %Force options into a cell
     if ~iscell(Options)
         Options = {Options};
@@ -138,5 +151,16 @@ function index = FieldMatch(Details,index,Field,Options)
     for i = find(index)
         %Search for Options in Field
         index(i) = any(regexpi(Details(i).(Field),regexpStr));
+    end
+end
+
+function valid = validateDate(x)
+    if isa(x,'datetime') && length(x)==1
+        valid = true;
+    elseif ischar(x)
+        %Check if the correct dataformat is used
+        valid = any(regexpi(x,'\d{1,2}/\d{1,2}/\d{4}'));
+    else
+        valid = false;
     end
 end

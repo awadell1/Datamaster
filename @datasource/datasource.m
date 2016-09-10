@@ -42,6 +42,8 @@ classdef datasource < handle
         TimePlot(ds,varargin)
         
         openInMoTeC(ds)
+
+        duration = driveTime(ds,varargin)
     end
     
     methods (Access = public)
