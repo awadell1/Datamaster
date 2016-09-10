@@ -62,8 +62,7 @@ function stats = RecursivelyOpen(s)
                 end
             else
                 %Check if item is a .id
-                [~,~,type] = fileparts(itemLoc);
-                if strcmp(type,'.ld')
+                if any(regexpi(itemLoc,'.(ld)(?!x)'))
                     %Check if file as already been exported
                     switch CheckLogFileStatus(s.Datamaster,itemLoc)
                         case 'new'
