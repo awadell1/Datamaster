@@ -39,6 +39,6 @@ function checkAllDatasourcesExist(dm)
     
     %Remove enteries with missing datasources
     if any(rmIndex)
-        dm.removeEntry(dm.mDir(rmIndex).FinalHash);
+        dm.removeEntry({dm.mDir(rmIndex).FinalHash});
     end
 end

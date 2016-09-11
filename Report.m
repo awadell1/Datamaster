@@ -1,13 +1,10 @@
 %% Summary Report for Recent Logging Events
-% This report was automatically generated using the Datamaster project
-%%
+% This report was automatically generated using the following version of
+% the Datamaster project
 
 clear all
-
-%%
-% This Report was Generated using the following version of the Datamaster
-% project
 dr = DataReporter;
+%%
 hash = {dr.dm.getEntry.OriginHash};
 
 %% Database Integrity Report
@@ -17,3 +14,5 @@ hash = {dr.dm.getEntry.OriginHash};
 
 dr.checkDetails(hash);
 
+%% Engine RPM
+dr.dm.getDatasource(hash).Histogram('Engine_RPM',[0 5000]);

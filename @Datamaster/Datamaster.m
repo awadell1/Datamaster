@@ -74,6 +74,8 @@ classdef Datamaster < handle
         
         valid = validateHash(dm, hash)
         
+        LoggedParameters = allLogged(dm,varargin)
+        
     end
     
 end

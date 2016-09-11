@@ -5,5 +5,9 @@ function duration = driveTime(ds,varargin)
 
 	% Lop over Log Files
 	for i = 1:length(ds)
-		duration = duration + range(ds(i).getChannel('Engine_RPM').Time);
+        try
+            duration = duration + range(ds(i).getChannel('Engine_RPM').Time);
+        catch e
+            warning(e.identifier,e.message);
+        end
 	end

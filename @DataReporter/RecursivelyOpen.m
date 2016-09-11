@@ -76,6 +76,9 @@ function stats = RecursivelyOpen(s)
                             else
                                 stats.Corupt = stats.Corupt +1;
                             end
+                        case 'corrupt'
+                            stats.Corupt = stats.Corupt +1;
+                            fprintf('Corrupt: .%s...Skipping\n',itemLoc(length(s.ParentDir)+1:end));
                         case 'modified'
                             stats.Modified = stats.Modified +1;
                             fprintf('Modified: .%s...Skipping\n',itemLoc(length(s.ParentDir)+1:end));

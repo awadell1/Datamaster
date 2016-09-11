@@ -11,6 +11,8 @@ function ax = Histogram(ds,varargin)
         p.addParameter('ax',         gca,       @(x) isa(x,matlab.graphics.axis.Axes));
         p.addParameter('unit',		   [],        @ischar);
         p.addParameter('nBins',		   50,        @isfloat);
+        p.addParameter('Normalization',     'count',...
+            @(x) any(strcmp(x,{'count','probability'})));
     end
     
     %Parse Input
@@ -33,16 +35,38 @@ function ax = Histogram(ds,varargin)
     %Initialize arrays
     count = zeros(1,nBins);
     edges = linspace(Range(1),Range(2),nBins+1);
+    duration = 0;
     %Loop over each datasource
-    for i = 1:length(ds)
-        %Bin logged data for each datasource
-        count = histcounts(ds(i).getChannel(chanName).Value,edges) + count;
-
-        %Clear data to preserve RAM
-        ds(i).clearData;
+    h = waitbar(0,'Generating Histogram');
+    nDatasource = length(ds);
+    for i = 1:nDatasource
+        %Check if datasourc has logged Parameter
+        if any(strcmp(chanName,ds(i).getLogged))
+            %Bin logged data for each datasource
+            count = histcounts(ds(i).getChannel(chanName).Value,edges) + count;
+            duration = range(ds(i).getChannel(chanName).Time) + duration;
+            
+            %Clear data to preserve RAM
+            ds(i).clearData; 
+        end
+        
+        %Update Waitbar
+        waitbar(i/nDatasource)
     end
+    delete(h);
     
+    %Normalize Counts
+    switch p.Results.Normalization
+        case 'probability'
+           count = count ./ sum(count);
+        case 'count'
+            %Do Nothing
+    end
     %Plot the histogram
     xBarPoints = (edges(1:end-1) + edges(2:end))/2;
     bar(ax,xBarPoints,count);
+    
+    %Label Histogram
     xlabel(sprintf('%s [%s]',chanName,unit),'interpreter','none')
+    ylabel(p.Results.Normalization);
+    title(sprintf('Based on %3.2f hrs of data',duration/3600));
