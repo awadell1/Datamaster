@@ -36,10 +36,9 @@ function ax = Histogram(ds,varargin)
     count = zeros(1,nBins);
     edges = linspace(Range(1),Range(2),nBins+1);
     duration = 0;
+    
     %Loop over each datasource
-    h = waitbar(0,'Generating Histogram');
-    nDatasource = length(ds);
-    for i = 1:nDatasource
+    for i = 1:length(ds)
         %Check if datasourc has logged Parameter
         if any(strcmp(chanName,ds(i).getLogged))
             %Bin logged data for each datasource
@@ -47,18 +46,14 @@ function ax = Histogram(ds,varargin)
             duration = range(ds(i).getChannel(chanName).Time) + duration;
             
             %Clear data to preserve RAM
-            ds(i).clearData; 
+            ds(i).clearData;
         end
-        
-        %Update Waitbar
-        waitbar(i/nDatasource)
     end
-    delete(h);
     
     %Normalize Counts
     switch p.Results.Normalization
         case 'probability'
-           count = count ./ sum(count);
+            count = count ./ sum(count);
         case 'count'
             %Do Nothing
     end

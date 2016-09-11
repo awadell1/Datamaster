@@ -4,7 +4,7 @@ classdef datasource < handle
     properties (Access = public)
         FinalHash = [];         %Final Hash of the datasource
         Data = struct;          %Stucture of Logged Data
-        %
+        Entry = [];
     end
     properties (Access = public)
         dm = [];    %Handle to Datamaster Object
@@ -12,26 +12,22 @@ classdef datasource < handle
     end
     
     methods
-        function obj = datasource(dm,FinalHash)
+        function obj = datasource(dm,Entry)
             obj.dm = dm;
-            obj.FinalHash = FinalHash;
+            obj.Entry = Entry;
             
-            obj.MatPath = fullfile(dm.getDatastore,[FinalHash '.mat']);
+            obj.MatPath = fullfile(dm.getDatastore,[Entry.FinalHash '.mat']);
         end
         
         %Access Methods
         function channels = getLogged(ds)
-            channels = ds.dm.getEntry(ds.FinalHash).Parameters(:);
+            channels = ds.Entry.Parameters(:);
         end
         
         function detail = getDetails(ds,Detail)
-            detail = ds.dm.getEntry(ds.FinalHash).Details.(Detail);
+            detail = ds.Entry.Details.(Detail);
         end
-        
-        function entry = Entry(ds)
-            entry = ds.dm.getEntry(ds.FinalHash);
-        end
-        
+               
         function clearData(ds)
             %Clear Loaded Data from memory
             ds.Data = [];

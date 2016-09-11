@@ -10,7 +10,7 @@ function [entry, index] = getEntry(dm,varargin)
     
     %Create Persistent Input Parser to handle reading inputs
     persistent p
-    if isempty(p) || true
+    if isempty(p)% || true
         p = inputParser;
         p.FunctionName = 'getEntry';
         addRequired(p,'obj',@(x) isa(x,'Datamaster'));
@@ -30,7 +30,7 @@ function [entry, index] = getEntry(dm,varargin)
         
         % Add Parameters to control how many results are returned
         addParameter(p,'Return',    [],         @isfloat);
-        addParameter(p,'Sort',      'newest',   @ischar);
+        addParameter(p,'Sort',      [],         @ischar);
     end
     
     %Parse Inputs and expand to vectors
@@ -41,7 +41,10 @@ function [entry, index] = getEntry(dm,varargin)
     EndDate = p.Results.EndDate;
     
     %Grab the Details List
-    Details = [dm.mDir.Details];
+    persistent Details
+    if isempty(Details)
+        Details = [dm.mDir.Details];
+    end
     
     if nargin == 1
         index = true(1,dm.numEnteries);
@@ -110,8 +113,9 @@ function [entry, index] = getEntry(dm,varargin)
         end
     end
     
+    %% Sort Results
     %Check if anything is returned before sorting
-    if ~isempty(index) && sum(index~=0)>0
+    if ~isempty(p.Results.Sort) && ~isempty(index) && sum(index~=0)>0
         %% Sort the Results
         switch p.Results.Sort
             case 'newest'
@@ -128,14 +132,14 @@ function [entry, index] = getEntry(dm,varargin)
         
         %Convert Logical to Order Indexing
         index = sortIndex(index(sortIndex));
-        
-        %% Limit Number of Results
-        if ~isempty(p.Results.Return)
-            %Only return the first n enteries
-            index((p.Results.Return+1):end) = [];
-        end
-        
     end
+    
+    %% Limit Number of Results
+    if ~isempty(p.Results.Return)
+        %Only return the first n enteries
+        index((p.Results.Return+1):end) = [];
+    end
+    
     %% Return Entry to User
     entry = dm.mDir(index);
 end
