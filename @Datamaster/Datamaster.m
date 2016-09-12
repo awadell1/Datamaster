@@ -22,7 +22,7 @@ classdef Datamaster < handle
             
             %Set Relavant Locations
             obj.Datastore = 'C:\Users\Alex\OneDrive\ARG17\Datamaster\Datastore\';
-            obj.mDirLoc = fullfile(obj.Datastore,'mDir.mat');
+            obj.mDirLoc = 'C:\Users\Alex\OneDrive\ARG17\Datamaster\Datastore\mDir.mat';
             
             %Connect to the Directory
             if exist(obj.mDirLoc,'file')

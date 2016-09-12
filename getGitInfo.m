@@ -1,4 +1,4 @@
-function gitInfo=getGitInfo()
+function gitInfo=getGitInfo(varargin)
 % Get information about the Git repository in the current directory, including: 
 %          - branch name of the current Git Repo 
 %          -Git SHA1 HASH of the most recent commit
@@ -57,7 +57,13 @@ function gitInfo=getGitInfo()
 % or implied, of <copyright holder>.
 
  gitInfo=[];
-if ~exist('.git','file') || ~exist('.git/HEAD','file')
+if ~isempty(varargin) && length(varargin) ==1
+    repoPath = fullfile(varargin{1},'.git');
+else
+    repoPath = '.git';
+end
+
+if ~exist(repoPath,'file') || ~exist([repoPath '/HEAD'],'file')
     %Git is not present
     return
 end
@@ -66,7 +72,7 @@ end
 
 %Read in the HEAD information, this will tell us the location of the file
 %containing the SHA1
-text=fileread('.git/HEAD');
+text=fileread([repoPath '/HEAD']);
 parsed=textscan(text,'%s');
 
 if ~strcmp(parsed{1}{1},'ref:') || ~length(parsed{1})>1
@@ -84,13 +90,13 @@ gitInfo.branch=branchName;
 
 
 %Read in SHA1
-SHA1text=fileread(fullfile(['.git/' pathstr],[name ext]));
+SHA1text=fileread(fullfile([repoPath '\' pathstr],[name ext]));
 SHA1=textscan(SHA1text,'%s');
 gitInfo.hash=SHA1{1}{1};
 
 
 %Read in config file
-config=fileread('.git/config');
+config=fileread([repoPath '/config']);
 %Find everything space delimited
 temp=textscan(config,'%s','delimiter','\n');
 lines=temp{1};
