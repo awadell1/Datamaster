@@ -1,4 +1,4 @@
-function ax = Histogram(ds,varargin)
+function [count,ax] = Histogram(ds,varargin)
     %Function to generate a histogram of the specified channel for all supplied datasources
     
     persistent p
