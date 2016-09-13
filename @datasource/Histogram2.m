@@ -1,4 +1,4 @@
-function [count,ax] = Histogram2(ds,varargin)
+function [count,h,ax] = Histogram2(ds,varargin)
     %Function to generate a histogram of the specified channel for all supplied datasources
     
     persistent p
@@ -12,8 +12,8 @@ function [count,ax] = Histogram2(ds,varargin)
         p.addParameter('ax',         gca,       @(x) isa(x,matlab.graphics.axis.Axes));
         p.addParameter('unit',		   [],      @(x) iscell(x) && numel(x) == 2);
         p.addParameter('nBins',		   [50,50],        @(x) isfloat(x) && length(x)==2);
-        p.addParameter('Normalization',     'probability',...
-            @(x) any(strcmp(x,{'count','probability'})));
+        p.addParameter('Normalization',     'pdf',...
+            @(x) any(strcmp(x,{'count','probability','pdf'})));
     end
     
     %Parse Input
@@ -40,7 +40,7 @@ function [count,ax] = Histogram2(ds,varargin)
     edgesX = linspace(Range(1,1),Range(1,2),nBins(1)+1);
     edgesY = linspace(Range(2,1),Range(2,2),nBins(2)+1);
 
-    duration = 0; XMax = 0; YMax = 0;
+    duration = 0;
     %Loop over each datasource
     for i = 1:length(ds)
         %Check if datasourc has logged Parameter
@@ -49,9 +49,6 @@ function [count,ax] = Histogram2(ds,varargin)
             channelX = ds(i).getChannel(chanNameX);
             channelY = ds(i).getChannel(chanNameY);
             
-            XMax = max([channelX.Value,XMax]);
-            YMax = max([channelY.Value,YMax]);
-
             %Upsample if needed otherwise just use raw data
             if isequal(channelX.Time,channelY.Time)
                 %No Need for Interpolation
@@ -88,36 +85,46 @@ function [count,ax] = Histogram2(ds,varargin)
     
     %Normalize Counts
     switch p.Results.Normalization
+        case 'pdf'
+            %Compute Area of each bin
+            cellArea = range(Range(1,:))*range(Range(2,:));
+            cellArea = cellArea / numel(count);
+            
+            %Norm by number of bins and area of each bin
+            count = count ./(sum(count(:))*cellArea);
+            
+            %Set label for colorbar
+            cBarLabel = 'log10(Probability Density)';
         case 'probability'
             count = count ./ sum(sum(count));
+            
+            %Set label for colorbar
+            cBarLabel = 'log10(Probability)';
         case 'count'
-            %Do Nothing
+            %Set label for colorbar
+            cBarLabel = 'log10(Count)';
     end
+    
+    %Due to the wide range of orders of magnitude-> take the log
+    count = log10(count);
 
-    %Plot the histogram
+    %Plot the histogram and turn of countour lines
     xBarPoints = (edgesX(1:end-1) + edgesX(2:end))/2;
     yBarPoints = (edgesY(1:end-1) + edgesY(2:end))/2;
-    [~,h] = contourf(xBarPoints,yBarPoints,count');
+    [~,h] = contourf(xBarPoints,yBarPoints,count'); %Transpose as countourf and histocounts define x differently
+    h.LineStyle = 'none';
+    box on
+    grid on
     
-    %Set Levels for contour lines to be placed every 10% percentile
-    percentiles = 0:20:100;
-    Levels = prctile(count(count>0),percentiles);
-    h.LevelList = Levels;
+    %Add and label the colorbar
+    cBar = colorbar;
+    ylabel(cBar,cBarLabel);
     
-     h.ShowText = 'on'; drawnow;
-    Text = h.TextPrims;
-    for i = 1:length(Text)
-        %Match Label to Level
-        [~,index] = min(abs(str2double(Text(i).String) - Levels));
-        
-        %Replace with Percentile
-        Text(i).String = sprintf('%.f%%',100-percentiles(index));
-        
-    end
+    %Set the coloraxis to something reasonable
+    m = mean(count(~isinf(count))); s = std(count(~isinf(count)));
+    caxis([m-3*s, m+3*s]);
     
     %Label Histogram
     xlabel(sprintf('%s [%s]',chanNameX,unit{1}),'interpreter','none')
     ylabel(sprintf('%s [%s]',chanNameY,unit{2}),'interpreter','none')
     title(sprintf('Based on %3.2f hrs of data',duration/3600));
-    
-    fprintf('XMax :%f YMax: %f\n',XMax,YMax);
