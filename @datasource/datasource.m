@@ -27,35 +27,48 @@ classdef datasource < handle
         function detail = getDetails(ds,Detail)
             detail = ds.Entry.Details.(Detail);
         end
-               
-        function clearData(ds)
-            %Clear Loaded Data from memory
-            ds.Data = [];
+        
+        function clearData(ds,varargin)
+            switch nargin
+                case 1
+                    %Clear Loaded Data from memory
+                    ds.Data = struct;
+                case 2
+                    ds.Data = rmfield(ds.Data,varargin{1});
+            end
         end
         %Public Function Signitures
-        channel = getChannel(ds,chanName)
+        channel = getChannel(ds,chanName,varargin)
         
         TimePlot(ds,varargin)
         
         openInMoTeC(ds)
-
+        
         duration = driveTime(ds,varargin)
     end
     
     methods (Access = public)
         function loadChannels(ds,channelNames)
+            
+            %Force channel names into a cell array
+            if ~iscell(channelNames)
+                channelNames = {channelNames};
+            end
+            
+            %Loop over each datasource
             for i = 1:length(ds)
-                %Load New Channels
-                if isa(channelNames,'cell')
-                    newData = load(ds(i).MatPath,channelNames{:});
-                else
-                    newData = load(ds(i).MatPath,channelNames);
-                end
+                %Find missing channels
+                isMissing = ~isfield(ds(i).Data,channelNames);
                 
-                %Append to Data
-                vars = fieldnames(newData);
-                for j = 1:length(vars)
-                    ds(i).Data.(vars{j}) = newData.(vars{j});
+                %Load Missing Channels
+                if any(isMissing)
+                    newData = load(ds(i).MatPath,channelNames{isMissing});
+                    
+                    %Append to Data
+                    vars = fieldnames(newData);
+                    for j = 1:length(vars)
+                        ds(i).Data.(vars{j}) = newData.(vars{j});
+                    end
                 end
             end
         end

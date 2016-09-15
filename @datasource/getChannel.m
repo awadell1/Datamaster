@@ -1,22 +1,51 @@
-function channel = getChannel(ds,chanName)
+function channel = getChannel(ds,chanName,varargin)
     
     %Validate Channel Names
-    if ~validateChannel(ds,chanName)
-        msgid = 'Datamaster:Datasource:InvalidChannel';
-        msg = sprintf('Channel: %s, Datasource: %s',chanName,ds.FinalHash);
-        error(msgid,msg);
+    persistent p
+    if ~isempty(p) || true
+        p = inputParser;
+        p.FunctionName = 'Histogram2';
+        p.addRequired('ds',@(x) isa(x,'datasource') && length(x)==1);
+        p.addRequired('chanName',@(x) ischar(x) || iscell(x));
+        p.addOptional('filter',[],@(x) any(strcmp(x,{'none','hampel','median'})));
     end
     
-    assert(size(ds,2) == 1, 'ds must be a single datasource object');
+    %Extract Parameters
+    parse(p,ds,chanName,varargin{:});
+    ds = p.Results.ds;
+    chanName = p.Results.chanName;
+    filter = p.Results.filter;
     
     if isa(chanName,'cell')
         for i = 1:length(chanName)
             channel.(chanName{i}) = ds.getChannel(chanName{i});
         end
     else
-        %Check if Channel has been loaded
-        if ~any(strcmp(chanName,fieldnames(ds.Data)))
+        %Check if Channel has been loaded or filtering is set
+        if ~isfield(ds.Data,chanName) || ~isempty(filter)
+            ds.clearData(chanName);
             ds.loadChannels(chanName);
+        end
+        
+        %Apply Filtering
+        if ~isempty(filter)
+            switch filter
+                case 'hampel'
+                    %Number of samples on either side to be used when computing the std and median
+                    k = 13;
+                    
+                    %Number of Standard of deviations a sample must deviate to be an outlier
+                    nSigma = 3;
+                    
+                    %Apply Filer
+                    ds.Data.(chanName).Value = hampel(ds.Data.(chanName).Value,k,nSigma);
+                case 'median'
+                    %Number of samples on either side to be used when computing the median
+                    n = 13;
+                    
+                    %Apply Filer
+                    ds.Data.(chanName).Value = medfilt1(ds.Data.(chanName).Value,n);
+            end
         end
         
         %Return Channel
