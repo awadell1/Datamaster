@@ -109,7 +109,14 @@ function [entry, index] = getEntry(dm,varargin)
         %% Search by Parameters
         if ~isempty(channel)
             Parameters = {dm.mDir.Parameters};
-            index = index & cellfun(@(x) any(strcmpi(x,channel)),Parameters);
+            
+            %Force into cell array
+            if ~iscell(channel)
+                channel = {channel};
+            end
+            for i = 1:length(channel)
+                index = index & cellfun(@(x) any(strcmpi(x,channel{i})),Parameters);
+            end
         end
     end
     
@@ -125,7 +132,7 @@ function [entry, index] = getEntry(dm,varargin)
                 %Sort Oldest to Newest
                 [~,sortIndex] = sort([Details.Datetime],'descend');
             case 'rand'
-                sortIndex = floor(rand*length(index))+1;
+                sortIndex = randperm(length(index));
             otherwise
                 error('Unrecognized Sort Type');
         end
