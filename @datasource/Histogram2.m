@@ -4,7 +4,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
     persistent p
     if ~isempty(p) || true
         p = inputParser;
-        p.FunctionName = 'Histogram';
+        p.FunctionName = 'Histogram2';
         p.addRequired('ds',                     @(x) isa(x,'datasource'));
         p.addRequired('chanNameX',              @(x) ischar(x));
         p.addRequired('chanNameY',              @(x) ischar(x));
@@ -42,7 +42,8 @@ function [count,h,ax] = Histogram2(ds,varargin)
 
     duration = 0;
     %Loop over each datasource
-    for i = 1:length(ds)
+    nDatasource = length(ds);
+    for i = 1:nDatasource
         %Check if datasourc has logged Parameter
         if any(strcmp(chanNameX,ds(i).getLogged)) && any(strcmp(chanNameY,ds(i).getLogged))
             %Get Channels
@@ -81,6 +82,11 @@ function [count,h,ax] = Histogram2(ds,varargin)
             %Clear data to preserve RAM
             ds(i).clearData;
         end
+        
+        %Report Progress in 10% steps
+        if ~mod(i,100)
+            fprintf('%3.2f%% Complete\n',100*(i/nDatasource));
+        end
     end
     
     %Normalize Counts
@@ -117,7 +123,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
     grid on
     
     %Add and label the colorbar
-    cBar = colorbar;
+    cBar = colorbar; colormap(jet);
     ylabel(cBar,cBarLabel);
     
     %Set the coloraxis to something reasonable

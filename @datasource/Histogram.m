@@ -11,8 +11,8 @@ function [count,ax] = Histogram(ds,varargin)
         p.addParameter('ax',         gca,       @(x) isa(x,matlab.graphics.axis.Axes));
         p.addParameter('unit',		   [],        @ischar);
         p.addParameter('nBins',		   50,        @isfloat);
-        p.addParameter('Normalization',     'count',...
-            @(x) any(strcmp(x,{'count','probability'})));
+        p.addParameter('Normalization',     'pdf',...
+            @(x) any(strcmp(x,{'count','probability','pdf'})));
     end
     
     %Parse Input
@@ -21,7 +21,7 @@ function [count,ax] = Histogram(ds,varargin)
     chanName = p.Results.chanName;
     nBins = p.Results.nBins;
     Range = p.Results.Range;
-    ax = p.Results.ax;
+    ax = p.Results.ax;bo
     
     %Set the Unit
     %Set Unit
@@ -38,7 +38,8 @@ function [count,ax] = Histogram(ds,varargin)
     duration = 0;
     
     %Loop over each datasource
-    for i = 1:length(ds)
+    nDatasource = length(ds);
+    for i = 1:nDatasource
         %Check if datasourc has logged Parameter
         if any(strcmp(chanName,ds(i).getLogged))
             %Bin logged data for each datasource
@@ -48,18 +49,28 @@ function [count,ax] = Histogram(ds,varargin)
             %Clear data to preserve RAM
             ds(i).clearData;
         end
+        
+        %Report Progress
+        if ~mod(i,100)
+            fprintf('%3.2f%% Complete\n',100*(i/nDatasource));
+        end
     end
     
     %Normalize Counts
     switch p.Results.Normalization
+        case 'pdf'
+            count = count ./ (sum(count) * (range(Range)/nBins));
+            ylabel('Proablility Density');
         case 'probability'
             count = count ./ sum(count);
+            ylabel('Probability');
         case 'count'
             %Do Nothing
+            ylabel('Count');
     end
     %Plot the histogram
     xBarPoints = (edges(1:end-1) + edges(2:end))/2;
-    bar(ax,xBarPoints,count);
+    bar(ax,xBarPoints,count,'histc');
     
     %Label Histogram
     xlabel(sprintf('%s [%s]',chanName,unit),'interpreter','none')
