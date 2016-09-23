@@ -1,4 +1,4 @@
-function [entry, index] = getEntry(dm,varargin)
+function [entry, index] = getEntry(varargin)
     %Function to retrieve directory entries from Datamaster
     %StartDate/EndData must be either a datetime or string of the format
     %MM/dd/uuuu
@@ -34,7 +34,8 @@ function [entry, index] = getEntry(dm,varargin)
     end
     
     %Parse Inputs and expand to vectors
-    parse(p,dm,varargin{:});
+    parse(p,varargin{:});
+    dm = p.Results.obj;
     Hash = p.Results.Hash;
     channel = p.Results.channel;
     StartDate = p.Results.StartDate;
@@ -143,6 +144,11 @@ function [entry, index] = getEntry(dm,varargin)
     
     %% Limit Number of Results
     if ~isempty(p.Results.Return)
+        %Conver to Logical
+        if islogical(index)
+            index = find(index);
+        end
+        
         %Only return the first n enteries
         index((p.Results.Return+1):end) = [];
     end

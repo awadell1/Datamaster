@@ -21,7 +21,7 @@ function [count,ax] = Histogram(ds,varargin)
     chanName = p.Results.chanName;
     nBins = p.Results.nBins;
     Range = p.Results.Range;
-    ax = p.Results.ax;bo
+    ax = p.Results.ax;
     
     %Set the Unit
     %Set Unit

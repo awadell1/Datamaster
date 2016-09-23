@@ -2,7 +2,6 @@ classdef datasource < handle
     %Class for structing MoTeC Log Data and supporting documentation
     
     properties (Access = public)
-        FinalHash = [];         %Final Hash of the datasource
         Data = struct;          %Stucture of Logged Data
         Entry = [];
     end
@@ -34,7 +33,9 @@ classdef datasource < handle
                     %Clear Loaded Data from memory
                     ds.Data = struct;
                 case 2
-                    ds.Data = rmfield(ds.Data,varargin{1});
+                    if isfield(ds.Data,varargin{1})
+                        ds.Data = rmfield(ds.Data,varargin{1});
+                    end
             end
         end
         %Public Function Signitures

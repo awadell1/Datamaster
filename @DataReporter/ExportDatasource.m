@@ -55,14 +55,14 @@ function [success,FinalHash] = ExportDatasource(dataSource,s)
         %Save Details
         Details.Event            = details{1};
         Details.Venue            = details{2};
-        Details.Length           = details{3};
-        Details.Driver           = details{5};
+        Details.Length           = details{3};  %Unused
+        Details.Driver           = details{5}; 
         Details.VehicleID        = details{6};
-        Details.VehicleNumber    = details{7};
-        Details.VehicleDesc      = details{8};
+        Details.VehicleNumber    = details{7};  %Unused
+        Details.VehicleDesc      = details{8};  %Unused
         Details.EngineID         = details{9};
         Details.Session          = details{10};
-        Details.StartLap         = details{11};
+        Details.StartLap         = details{11}; %Unused
         Details.Short            = details{12};
         Details.Long             = details{13};
         

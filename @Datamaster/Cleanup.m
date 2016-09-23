@@ -1,7 +1,7 @@
 function Cleanup(obj)
     %Checks for and removes temporary files from the datastore directory
     
-    %Get items in the Datastrore Directory
+    %Get items in the Datastore Directory
     items = dir(obj.Datastore);
     for i = 1:length(items)
         %Check if item is temporary

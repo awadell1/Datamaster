@@ -62,7 +62,7 @@ classdef Datamaster < handle
         
         Datasource = getDatasource(obj,varargin)
         
-        [Entry,index] = getEntry(obj,varargin)
+        [Entry,index] = getEntry(varargin)
         
         removeEntry(obj,varagin)
         

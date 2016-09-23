@@ -17,8 +17,8 @@ function checkDetails(dr,hash)
         	{'ACCEL', 'AUTOX', 'ENDUR', 'SKID', 'HOLD', 'SWEEP', 'WARM', 'OTHER'});
 
         %% Validate Venue
-		Error(i) = Error(i) + SelectionField(ds(i),'Venue',...
-			{'BLOT', 'DYNO', 'LAB', 'MIS', 'GLEN', 'DESTIN', 'GROTON'});
+		Error(i) = Error(i) + SelectionField(ds(i),'Venue',... 
+			{'BLOT', 'DYNO', 'LAB', 'MIS', 'GLEN', 'DESTINY', 'GROTON'});
 
 		%% Validate Engine ID -> Tune File name
 		%TODO: Find Tune Files
@@ -32,11 +32,11 @@ function checkDetails(dr,hash)
 		Error(i) = Error(i)	+ RegExpTester(ds(i),'Driver','^(([a-z]{2,3}\d+)\s*)+$');
 
 		%% Validate Session -> Subteam ID + netid
-		AllowedEvent = {'DRIVE', 'DYNO', 'FLOW', 'AERO', 'ERGO', 'UNSPRUNG', 'DTRAIN' };	%Cell Array of Allowed Subteam ID's
+		SubteamID = {'DRIVE', 'DYNO', 'FLOW', 'AERO', 'ERGO', 'UNSPRUNG', 'DTRAIN' };	%Cell Array of Allowed Subteam ID's
 
 		%Check if valid entry
 		Error(i) = Error(i)	+ RegExpTester(ds(i),'Session',...
-			['^(' strjoin(AllowedEvent,'|') ')[^a-z0-9]([a-z]{2,3}\d+)$']);
+			['^(' strjoin(SubteamID,'|') ')[^a-z0-9]([a-z]{2,3}\d+)$']);
 
 		%% Validate Short Comment
 		Sys_Id = {'ENG', 'CHA', 'EE'};
