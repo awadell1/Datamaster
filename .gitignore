@@ -4,3 +4,9 @@ Datastore/
 
 #Ignore html folder
 html/
+
+#Ignore Config File
+config.ini
+
+#Ignore zip folders
+*.zip
