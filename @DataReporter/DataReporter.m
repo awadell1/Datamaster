@@ -18,9 +18,14 @@ classdef DataReporter
         %% Function Signitures
         stats = RefreshDatastore(dr)
         
+        
+        
         checkDetails(dr,hash);
     end
     
+    methods(Static)
+        [Details] = getDetails(idxFilename)
+    end
     methods(Static, Access = private)
         stats = RecursivelyOpen(s)
         [success,FinalHash] = ExportDatasource(dataSource,s)
