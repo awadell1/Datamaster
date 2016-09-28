@@ -10,22 +10,37 @@ classdef DatamasterGUI < handle
     methods
         function obj = DatamasterGUI()
             %Initalize the main figure
-            obj.mainFig = figureGUI('Datamaster',[1000 600]);
+            mainHeight = 600; mainWidth = 1000;
+            obj.mainFig = figureGUI('Datamaster',[mainWidth mainHeight]);
             
-            %Create a Panel for getEntry
-            obj.getEntry = uipanel('Parent',obj.mainFig,...
-                'Title','Search for Datasources',...
-                'Units','normalized',...
-                'Position',[0.01 0.350 0.6 0.65]);
+            %% Create a Panel for inputing search quereys
             
-            %Add Textboxes for Search fields
+            %Set Parameters for sizing
+            panelHeight = 400; panelWidth = 400; %Height and Width of Panel
+            pad = 5;    %Space between figure and panel
+            
+            %Text Boxes to create
             fieldNames = {'Event','Venue','Length','Driver','VehicleID',...
                 'VehicleNumber','VehicleDesc','EngineID','Session',...
                 'StartLap','Short','Long'};
-            PosY = 340; stepY = 30;
+            
+            %Create the Panel
+            obj.getEntry = uipanel('Parent',obj.mainFig,...
+                'Title','Search for Datasources',...
+                'Units','pixels',...
+                'Position',[pad, mainHeight-panelHeight-pad, panelWidth, panelHeight]);
+            
+            %Add Textboxes for each Search fields
+            xCord = pad;
+            yCord = linspace(panelHeight-10-pad,pad/2,length(fieldNames)+1); %Create Array of upper and lower edges of Textboxes
+            
+            %Set the Height of each textbox
+            entryHeight = abs(diff(yCord)) - pad;
+            
+            yCord(1) = []; %Drop First Entry as we only need the bottom edges
+            
             for i = 1:length(fieldNames)
-                addTextbox(obj.getEntry,fieldNames{i},[fieldNames{i} ':'],5, PosY);
-                PosY = PosY -stepY;
+                addTextbox(obj.getEntry,fieldNames{i},[fieldNames{i} ':'],xCord, yCord(i)+pad/2, entryHeight(i));
             end
             
             %Add Buttons to search for Entries

@@ -1,7 +1,6 @@
-function addTextbox(parent,Tag,Label,left,bottom)
+function addTextbox(parent,Tag,Label,left,bottom,height)
     %Set Standard Height
-    height = 25;
-    LabelWidth = 100;
+    LabelWidth = 7*length(Label);
     fontSize = 10;
     
     %Create Label for textbox
@@ -12,7 +11,11 @@ function addTextbox(parent,Tag,Label,left,bottom)
         'String',Label,...
         'FontSize',fontSize,...
         'Units','pixels',...
-        'Position',[left bottom LabelWidth height]);
+        'Position',[left bottom 2 height]);
+    
+    %Find Label width
+    [~, pos] = textwrap(tb,{Label});
+    tb.Position(3) = pos(3);
     
     %Get Limits for textbox
     pad = 0.02; %Padding between text box and label

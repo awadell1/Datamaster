@@ -8,7 +8,9 @@ function LoggedParameters = allLogged(dm,varargin)
     %Return only unique ones
     LoggedParameters = unique(channels);
     
-    
-    
+    %Return Column array
+    if size(LoggedParameters,1) < size(LoggedParameters,2)
+        LoggedParameters = LoggedParameters.';
+    end    
 end
 
