@@ -19,10 +19,10 @@ classdef Datamaster < handle
         function obj = Datamaster()
             %Report Current Version info
             reportGitInfo;
-            
+
             %Set Relavant Locations
-            obj.Datastore = 'C:\Users\Alex\OneDrive\ARG17\Datamaster\Datastore\';
-            obj.mDirLoc = 'C:\Users\Alex\OneDrive\ARG17\Datamaster\Datastore\mDir.mat';
+            obj.Datastore = getConfigSetting('Datastore','master_dir_path');
+            obj.mDirLoc = getConfigSetting('Datastore','datastore_path');
             
             %Connect to the Directory
             if exist(obj.mDirLoc,'file')

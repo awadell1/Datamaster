@@ -1,0 +1,7 @@
+CREATE TABLE masterDirectory(
+	Id 				INT		PRIMARY KEY		NOT NULL,
+	ldId			TEXT					NOT NULL,
+	ldxId			TEXT					NOT NULL,
+	OriginHash		TEXT					NOT NULL,
+	FinalHash		TEXT					NOT NULL
+)
