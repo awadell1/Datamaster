@@ -28,7 +28,7 @@ classdef DataReporter
     end
     methods(Static, Access = private)
         stats = RecursivelyOpen(s)
-        [success,FinalHash] = ExportDatasource(dataSource,s)
+        [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
     end
     
 end

@@ -32,33 +32,30 @@ def getAuthToken():
         credential = tools.run_flow(flow, storage)
     return credential
 
+
 def getFileList():
+    # Authenticate with Google Drive
     credential = getAuthToken()
     http = credential.authorize(httplib2.Http())
-
     drive = build('drive', 'v3', http=http)
 
     pageToken = None
     file = []
     while True:
         # Grab a page of files from the server
-        response = drive.files().list(q='name contains \'.ld\'',
-                                    fields='nextPageToken, files(id, name, md5Checksum)',
-                                    pageSize=1000,
-                                    pageToken=pageToken).execute()
+        response = drive.files().list(q='fileExtension = \'ld\' or  fileExtension = \'ldx\'',
+                                      fields='nextPageToken, files(id, name, md5Checksum, createdTime)',
+                                      pageSize=1000,
+                                      orderBy='createdTime',
+                                      pageToken=pageToken).execute()
 
         # Get the token for the next page
-        pageToken = response.get('nextPageToken');
+        pageToken = response.get('nextPageToken')
 
         # Append to the list of files
-        file = file + response.get('files',[])
+        file = file + response.get('files', [])
 
-        #Break if no more pages
+        # Break if no more pages
         if pageToken is None:
-            break;
-    print(file)
+            break
     return file
-
-#   #   #Comment
-#   results = service.files().list(pageSize = 10,fields="nextPageToken, files(id, name)").execute()
-#   print(results.get('files',[]))

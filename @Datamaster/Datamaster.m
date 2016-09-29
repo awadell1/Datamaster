@@ -28,8 +28,8 @@ classdef Datamaster < handle
             if exist(obj.mDirLoc,'file')
                 load(obj.mDirLoc); obj.mDir = mDir;
             else
-                obj.mDir = struct('Origin',{},'OriginHash',{},'FinalHash',{},...
-                    'Details',{},'Parameters',{});
+                obj.mDir = struct('OriginLd',{},'OriginLdx',{},'OriginHash',{},...
+                    'FinalHash',{},'Details',{},'Parameters',{});
             end        
         end
         
@@ -75,7 +75,6 @@ classdef Datamaster < handle
         valid = validateHash(dm, hash)
         
         LoggedParameters = allLogged(dm,varargin)
-        
     end
     
 end
