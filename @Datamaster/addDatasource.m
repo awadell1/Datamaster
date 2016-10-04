@@ -1,19 +1,15 @@
-function FinalHash = addDatasource(obj,Origin,DatasourceLoc,Details)
-    %Controls Adding Datasources to the Database
-    FinalHash = '';
+function FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
     
-    
-    %Check Log File Status
-    [status,OriginHash] = obj.CheckLogFileStatus(Origin);
-    if strcmp(status,'new')
+    %Only add Datasource if new
+    if strcmp(dm.CheckLogFileStatus(MoTeCFile),'new')
         %% Append Parameters and Details
         maxTries = 10; nTry = 0;
         while nTry < maxTries
             try
                 %Get Logged Parameters
-                Parameters = whos('-file',DatasourceLoc);
-                Parameters = {Parameters.name};
-                save(DatasourceLoc,'Parameters','Details','-append');
+                channels = whos('-file',saveFile);
+                channels = {channels.name};
+                save(saveFile,'channels','Details','-append');
                 
                 %Mark as successful
                 nTry = maxTries;
@@ -29,15 +25,15 @@ function FinalHash = addDatasource(obj,Origin,DatasourceLoc,Details)
         end
         
         %Compute Hash of Datasource
-        FinalHash = DataHash(DatasourceLoc,obj.HashOptions);
+        FinalHash = DataHash(saveFile,dm.HashOptions);
         
         %% Move to Datastore
         maxTries = 10; nTry = 0;
         while nTry < maxTries
             try
                 %Move to Datastore
-                saveLoc = fullfile(obj.Datastore,[FinalHash '.mat']);
-                movefile(DatasourceLoc,saveLoc,'f');
+                saveLoc = fullfile(dm.Datastore,[FinalHash '.mat']);
+                movefile(saveFile,saveLoc,'f');
                 
                 %Ensure file is read only
                 fileattrib(saveLoc,'-w');
@@ -56,7 +52,7 @@ function FinalHash = addDatasource(obj,Origin,DatasourceLoc,Details)
         end
         
         %Add to Master Directory
-        obj.addEntry(Origin,OriginHash,FinalHash,Details,Parameters)
+        dm.addEntry(MoTeCFile,FinalHash,Details,channels)
     else
         error('Can Only Add New Datasources to the Datastore')
     end

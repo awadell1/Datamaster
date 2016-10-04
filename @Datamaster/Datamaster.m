@@ -4,9 +4,8 @@ classdef Datamaster < handle
     % providing access to the datasource en mass
     
     properties (Access = private)
-        mDir = struct;             %Handle to the mat file storing information on all datasources
+        mDir = connectSQLite;      %Connection Handle to the SQL Database
         Datastore = nan;           %Location of the Datastore
-        mDirLoc = nan;             %Location of the master directory
         
         %Hashing Settings
         HashOptions = struct('Method','SHA-256',...
@@ -21,16 +20,7 @@ classdef Datamaster < handle
             reportGitInfo;
 
             %Set Relavant Locations
-            obj.Datastore = getConfigSetting('Datastore','master_dir_path');
-            obj.mDirLoc = getConfigSetting('Datastore','datastore_path');
-            
-            %Connect to the Directory
-            if exist(obj.mDirLoc,'file')
-                load(obj.mDirLoc); obj.mDir = mDir;
-            else
-                obj.mDir = struct('OriginLd',{},'OriginLdx',{},'OriginHash',{},...
-                    'FinalHash',{},'Details',{},'Parameters',{});
-            end        
+            obj.Datastore = getConfigSetting('Datastore','datastore_path');     
         end
         
         %% Small Public Methods -> Move externally if it grows
@@ -38,14 +28,7 @@ classdef Datamaster < handle
             %Returns the Full Path to the Datastore
             DatastorePath = obj.Datastore;
         end
-        
-        function delete(obj)
-            %Method for deleteing Datamaster Object
-            
-            %Save Current Directory
-            obj.SaveDirectory;
-        end
-        
+                
         function num = numEnteries(dm)
             %Returns the number of Datasources stored in the Datastore
             num = size(dm.mDir,2);
@@ -54,11 +37,11 @@ classdef Datamaster < handle
     
     %% Function Signitures for Public Methods
     methods (Access = public)
-        [status,OriginHash] = CheckLogFileStatus(obj,LogFileLoc)
+        status = CheckLogFileStatus(obj,LogFileLoc)
         
-        FinalHash = addDatasource(obj,Origin,DatasourceLoc,Details)
+        FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
         
-        addEntry(obj,Origin,OriginHash,FinalHash,Details,Parameters)
+        addEntry(dm,MoTeCFile,FinalHash,Details,channels)
         
         Datasource = getDatasource(obj,varargin)
         

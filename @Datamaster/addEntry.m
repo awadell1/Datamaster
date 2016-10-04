@@ -1,18 +1,64 @@
-function addEntry(dm,Origin,OriginHash,FinalHash,Details,Parameters)
+function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     
-    %Get Index of new directory Entry
-    Index = dm.numEnteries +1;
+    %Turn off AutoCommit so changes happen all at once
+    set(dm.mDir, 'AutoCommit', 'off');
+
+    %Create cell array of column names and values
+    colNames = {'ldId', 'ldxId', 'OriginHash', 'FinalHash'};
+    values = {MoTeCFile.ld, MoTeCFile.ldx, MoTeCFile.OriginHash, FinalHash};
     
-    %Trim Origin to \Google Drive\
-    PathStart = strfind(Origin,'\Google Drive\');
-    Origin = Origin(PathStart:end);
+    %Insert into the directory
+    dm.mDir.fastinsert('masterDirectory',colNames,values);
     
-    dm.mDir(Index).Origin = Origin;
-    dm.mDir(Index).OriginHash = OriginHash;
-    dm.mDir(Index).FinalHash = FinalHash;
-    dm.mDir(Index).Details = Details;
-    dm.mDir(Index).Parameters = Parameters;
+    %Get id for datasource
+    query = sprintf('select id from MasterDirectory where FinalHash=''%s''',FinalHash);
+    datasourceId = dm.mDir.fetch(query); datasourceId = datasourceId{:};
     
-    %Update the Master Directory
-    SaveDirectory(dm)
+    %Add Missing Names to Details Logged
+    DetailName = dm.mDir.fetch('select fieldName from DetailName');
+    fieldName = fieldnames(Details); fieldName = fieldName(:);
+    [~,indexMissing] = setxor(fieldName,DetailName);
+    dm.mDir.fastinsert('DetailName',{'fieldName'},fieldName(indexMissing));
+    DetailName = dm.mDir.fetch('select fieldName from DetailName');
+
+    
+    %Record Details
+    for i =1:length(fieldName)
+        %Find fieldId
+        fieldId = find(strcmp(fieldName{i},DetailName));
+        
+        if isstruct(Details.(fieldName{i}))
+            dm.mDir.datainsert('DetailLog',{'entryId', 'fieldId', 'value', 'unit'},...
+             {datasourceId, fieldId, Details.(fieldName{i}).Value, Details.(fieldName{i}).Unit});
+%            dm.mDir.exec(sprintf('insert into DetailLog(entryId, fieldId, value, unit) VALUES(%f, %f, ''%s'', ''%s'')',...
+%                datasourceId, fieldId, Details.(fieldName{i}).Value, Details.(fieldName{i}).Unit));
+        else
+            dm.mDir.datainsert('DetailLog',{'entryId', 'fieldId', 'value'},...
+             {datasourceId, fieldId, Details.(fieldName{i})});
+%            dm.mDir.exec(sprintf('insert into DetailLog(entryId, fieldId, value) VALUES(%f, %f, ''%s'')',...
+%                datasourceId, fieldId, Details.(fieldName{i})));
+        end
+    end
+
+    %Add missing Channels
+    ChannelName = dm.mDir.fetch('select channelName from ChannelName');
+    [~,indexMissing] = setxor(channels,ChannelName);
+    dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
+    ChannelName = dm.mDir.fetch('select channelName from ChannelName');
+    
+    %Record Channels Logged
+    [~, channelId] = union(channels,ChannelName);
+    for i = 1:length(channelId)
+        data{i,1} = datasourceId;
+        data{i,2} = channelId(i);
+    end
+    
+    dm.mDir.fastinsert('ChannelLog',{'entryId','channelId'},data);
+
+    %Commit Changes to databse
+    dm.mDir.commit;
+
+    %Turn AutoCommit back on
+    set(dm.mDir, 'AutoCommit', 'on');
+    
 end

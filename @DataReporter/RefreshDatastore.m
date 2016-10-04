@@ -7,20 +7,17 @@ function stats = RefreshDatastore(dr)
     %Returns a cell array containg the OriginHashes of all newly exported
     %Log Files
     
+    %Create Stats to track progress
+    stats = struct('New',0,'Duplicate',0,'Modified',0,'Prior',0,'Corupt',0,'NewHash','');
     
     %Assert that the host computer is a pc
     assert(ispc,'Only a pc can export MoTeC Log files')
     
     %Get all MoTeC Log files stored on google drive
     MoTeCFile = updateDriveInfo();
-    
-    %% FOR TESTING ONLY -> LIMIT SIZE OF DATASTORE %%
-    MoTeCFile = MoTeCFile(1:20);
-    %% FOR TESTING ONLY -> LIMIT SIZE OF DATASTORE %%
-    
+      
     %Create MoTeC COM Server
     i2 = actxserver('MoTeC.i2Application');
-    i2.Visible = 1;
     pause(1);   %Wait for MoTeC to Open
     
     %Pull Datamaster handle from DataReporter
@@ -29,7 +26,7 @@ function stats = RefreshDatastore(dr)
     %Set Up Console
     startTime = tic;
     fprintf('\nSearching for New MoTeC Log Files...\n');
-    
+        
     %Loop over all log files
     for i = 1:length(MoTeCFile)
         %Check if file as already been exported
@@ -41,32 +38,26 @@ function stats = RefreshDatastore(dr)
                 %Check if export was successful
                 if success
                     stats.New = stats.New +1;
-                    stats.NewHash = [stats.NewHash FinalHash];
+                    stats.NewHash{end+1} = FinalHash;
                 else
                     stats.Corupt = stats.Corupt +1;
                 end
             case 'corrupt'
                 stats.Corupt = stats.Corupt +1;
-                fprintf('Corrupt: .%s...Skipping\n',item(i).name);
+                fprintf('Corrupt: %s...Skipping\n',MoTeCFile(i).OriginHash);
             case 'modified'
                 stats.Modified = stats.Modified +1;
-                fprintf('Modified: .%s...Skipping\n',item(i).name);
+                fprintf('Modified: %s...Skipping\n',MoTeCFile(i).OriginHash);
             case 'duplicate'
                 stats.Duplicate = stats.Duplicate +1;
-                fprintf('Duplicate: .%s...Skipping\n',item(i).name);
+                fprintf('Duplicate: %s...Skipping\n',MoTeCFile(i).OriginHash);
             case 'exported'
                 stats.Prior = stats.Prior +1;
-                fprintf('Prior Export: .%s...Skipping\n',item(i).name);
+                fprintf('Prior Export: %s...Skipping\n',MoTeCFile(i).OriginHash);
         end
         
     end
-    
-    % Start Search
-    stats = DataReporter.RecursivelyOpen(s);
-    
-    %Clean up Datastore
-    s.Datamaster.Cleanup
-    
+       
     %Report Duration
     fprintf('\n\nDatabase Refresh Complete\n');
     

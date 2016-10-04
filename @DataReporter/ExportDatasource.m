@@ -10,34 +10,42 @@ function [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
     success = false;
     FinalHash = '';
     
-    fprintf('Exporting: .%s',MoTeCFile.OriginHash);
+    fprintf('Exporting: %s',MoTeCFile.OriginHash);
+    startExport = tic;
     try
         %Create a random temp .mat file to export MoTeC Log file to
+        tempSaveLoc = getConfigSetting('Datastore','temp_path');
         saveFile = sprintf('temp_%.f.mat',1e10*rand);
-        saveFile = fullfile(fileparts(dm.getDatastore),saveFile);
+        saveFile = fullfile(tempSaveLoc,saveFile);
         save(saveFile,'saveFile');
         
         %Download the .ld and .ldx file to the Datastore
-        dsPath = getDatasourceDrive(MoTeCFile,dm.getDatastore);
+        motecSaveLoc = getConfigSetting('Datastore','motec_path');      %Get the save location from the config file
+        [ldPath, ldxPath] = getDatasourceDrive(MoTeCFile,motecSaveLoc); %Download files from Google
         
         %Open the Log File in MoTeC
-        i2.DataSources.Open(dsPath); pause(0.5);
+        i2.DataSources.Open(ldPath); pause(0.5);
         
         %% Export Datasource as .mat
         %Export to the Temp File then copy to a new file
+        tic
+        fprintf('\tExporting from MoTeC...')
         i2.DataSources.ExportMainAsMAT(saveFile); pause(0.1);
         i2.DataSources.CloseAll;
         
+        %Extract the Details
+        Details = getDetails(ldxPath);
+        fprintf('done in %3.2f s\n',toc);
+        
         %Request to add Datasource to the Datastore
+        tic
+        fprintf('\tAdding to database...')
         FinalHash = dm.addDatasource(MoTeCFile,saveFile,Details);
+        fprintf('done in %3.2f s\n',toc);
         
-        %% Clean Up
-        %Close out WShell Object
-        h.delete
-        fprintf('done.\n')
-        
-        %Set success flag
+        %Clean up
         success = true;
+        fprintf('\tdone in %3.2f s.\n',toc(startExport))
     catch e
         switch e.identifier
             case 'MATLAB:COM:E0'

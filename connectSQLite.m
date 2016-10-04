@@ -1,4 +1,4 @@
-function [SQLite_Database] = connectSQLite(dpath)
+function [SQLite_Database] = connectSQLite()
     %connectSQLite connects to an SQLite Database and returns a database connection
     
     %Check that the sqlite-jbdc driver is on the Java search path
@@ -14,6 +14,7 @@ function [SQLite_Database] = connectSQLite(dpath)
         javaaddpath(jbdc_path);
 
         %Add it to the static path for next time
+        JavaStaticPath = fullfile(prefdir,'javaclasspath.txt');
         fid = fopen(JavaStaticPath,'a');
         fprintf(fid,'%s\n',jbdc_path);
         fclose(fid);
@@ -30,5 +31,15 @@ function [SQLite_Database] = connectSQLite(dpath)
     
     %Open Connection
     SQLite_Database = database(dbpath, user, password, driver, url);
+    
+    %% Turn on Foriegn Key Support
+    % Get a handle to the underlying JDBC connection
+    h = SQLite_Database.Handle;
+    % Create your own statement
+    s = h.createStatement;
+    % Use this statement to execute the query
+    s.execute('PRAGMA foreign_keys=ON');
+    % Close the statement
+    s.close;
 end
 

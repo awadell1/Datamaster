@@ -10,9 +10,7 @@ classdef DataReporter
     
     methods
         function dr = DataReporter()
-            %Clean Up Datastore
-            dr.dm.Cleanup;
-            dr.dm.checkAllDatasourcesExist;
+            
         end
         
         %% Function Signitures

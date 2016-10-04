@@ -23,7 +23,7 @@ function [ldLoc, ldxLoc] = getDatasourceDrive(MoTeCFile,savePath)
     ldxLoc = retryDownload([savePath '.ldx'], url(MoTeCFile.ldx));
     
     %Report Done
-    fprintf('done in %3.2f.\n',toc(sTime));tic
+    fprintf('done in %3.2f s\n',toc(sTime));tic
     
 end
 
