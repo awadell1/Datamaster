@@ -23,14 +23,12 @@ function [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
         motecSaveLoc = getConfigSetting('Datastore','motec_path');      %Get the save location from the config file
         [ldPath, ldxPath] = getDatasourceDrive(MoTeCFile,motecSaveLoc); %Download files from Google
         
-        %Open the Log File in MoTeC
-        i2.DataSources.Open(ldPath); pause(0.5);
-        
         %% Export Datasource as .mat
         %Export to the Temp File then copy to a new file
         tic
         fprintf('\tExporting from MoTeC...')
-        i2.DataSources.ExportMainAsMAT(saveFile); pause(0.1);
+        i2.DataSources.Open(ldPath);
+        i2.DataSources.ExportMainAsMAT(saveFile);
         i2.DataSources.CloseAll;
         
         %Extract the Details

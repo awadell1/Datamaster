@@ -4,8 +4,8 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     set(dm.mDir, 'AutoCommit', 'off');
 
     %Create cell array of column names and values
-    colNames = {'ldId', 'ldxId', 'OriginHash', 'FinalHash'};
-    values = {MoTeCFile.ld, MoTeCFile.ldx, MoTeCFile.OriginHash, FinalHash};
+    colNames = {'ldId', 'ldxId', 'OriginHash', 'FinalHash', 'Datetime'};
+    values = {MoTeCFile.ld, MoTeCFile.ldx, MoTeCFile.OriginHash, FinalHash, MoTeCFile.createdTime};
     
     %Insert into the directory
     dm.mDir.fastinsert('masterDirectory',colNames,values);

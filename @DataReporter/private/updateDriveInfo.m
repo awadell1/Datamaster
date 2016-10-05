@@ -69,6 +69,7 @@ function datasource = updateDriveInfo()
         datasource(i).ld = files(ldIndex(i)).id;
         datasource(i).ldx = files(ldxIndex(i)).id;
         datasource(i).name = files(ldIndex(i)).name;
+        datasource(i).createdTime = files(ldIndex(i)).createdTime;
     end
   
     
