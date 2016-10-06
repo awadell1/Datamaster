@@ -3,26 +3,42 @@ function FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
     %Only add Datasource if new
     if strcmp(dm.CheckLogFileStatus(MoTeCFile),'new')
         %% Append Parameters and Details
-        maxTries = 10; nTry = 0;
-        while nTry < maxTries
-            try
-                %Get Logged Parameters
-                channels = whos('-file',saveFile);
-                channels = {channels.name};
-                save(saveFile,'channels','Details','-append');
-                
-                %Mark as successful
-                nTry = maxTries;
-            catch e
-                if strcmp(e.identifier,'MATLAB:save:unableToWriteToMatFile')
-                    pause(0.5*2^nTry);
-                    nTry = nTry +1;
-                    if nTry == maxTries
-                        rethrow(e)
+        %Load temporary mat file into workspace
+        ds = load(saveFile);
+        
+        
+        %Convert Double Precision values to signal precision MoTeC Logs
+        %data using ~12-14 bits per sample, thus using a 32 bit float
+        %(single-precision float) more then sufficent to store the data. By
+        %not storing samples as a double (64 bits), the final file size is
+        %reduced by ~33%, with marginal errors due to tuncation (On the
+        %order of 1e-6)
+        channels = fieldnames(ds);
+        for i = 1:length(channels)
+            %Check each subfield is a channel
+            if isstruct(ds.(channels{i})) && isfield(ds.(channels{i}),'Time') && ...
+                    isfield(ds.(channels{i}),'Value') && isfield(ds.(channels{i}),'Units')
+                %Loop over numeric fields for each channel
+                for fields = {'Time', 'Value'}
+                    field = fields{:}; %Get string from cell array
+                    
+                    %Only reduce if data type is double
+                    if isa(ds.(channels{i}).(field),'double')
+                        %Convert Double to Single Precision float
+                        ds.(channels{i}).(field) = single(ds.(channels{i}).(field));
                     end
                 end
             end
         end
+        
+        %Add Logged Parameters to temporary mat file
+        ds.Channels = channels;
+        
+        %Add Details to temporary mat file
+        ds.Details = Details;
+        
+        %Resave temporary mat file using v7.3
+        save(saveFile,'-struct','ds','-v7');
         
         %Compute Hash of Datasource
         FinalHash = DataHash(saveFile,dm.HashOptions);

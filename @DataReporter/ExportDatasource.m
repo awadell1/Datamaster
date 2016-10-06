@@ -42,6 +42,7 @@ function [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
         fprintf('done in %3.2f s\n',toc);
         
         %Clean up
+        delete(ldPath); delete(ldxPath); %Remove MoTeC Files
         success = true;
         fprintf('\tdone in %3.2f s.\n',toc(startExport))
     catch e
@@ -49,6 +50,21 @@ function [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
             case 'MATLAB:COM:E0'
                 %MoTeC Export Failed
                 fprintf('Export Failed\n')
+                
+                %Delete Temporary mat file if it exist
+                if exist(saveFile,'file')
+                    delete(saveFile);
+                end
+                
+                %Delete ld file if it exist
+                if exist(ldPath,'file')
+                    delete(ldPath);
+                end
+                
+                %Delete ldx mat file if it exist
+                if exist(ldxPath,'file')
+                    delete(ldxPath);
+                end
             otherwise
                 %Something Bad Happended
                 rethrow(e);

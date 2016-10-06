@@ -3,6 +3,15 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     %Turn off AutoCommit so changes happen all at once
     set(dm.mDir, 'AutoCommit', 'off');
 
+%     %Detirmine Creation Date for Log File
+%     if isfield(Details,'LogDate')
+%         %Extract the Date
+%         date = regexpi(Details.LogDate,'(\d{2})\\(\d{2})\\(\d{4})-');
+% 
+%         %Check if the creation time was also logged
+%         if isfield(Details,'LogTime')
+
+
     %Create cell array of column names and values
     colNames = {'ldId', 'ldxId', 'OriginHash', 'FinalHash', 'Datetime'};
     values = {MoTeCFile.ld, MoTeCFile.ldx, MoTeCFile.OriginHash, FinalHash, MoTeCFile.createdTime};
@@ -18,8 +27,15 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     DetailName = dm.mDir.fetch('select fieldName from DetailName');
     fieldName = fieldnames(Details); fieldName = fieldName(:);
     [~,indexMissing] = setxor(fieldName,DetailName);
-    dm.mDir.fastinsert('DetailName',{'fieldName'},fieldName(indexMissing));
-    DetailName = dm.mDir.fetch('select fieldName from DetailName');
+    
+    %Chec if no Detail Names are missing
+    if ~isempty(indexMissing)
+        %Add missing Detail names to the DetailName table
+        dm.mDir.fastinsert('DetailName',{'fieldName'},fieldName(indexMissing));
+        
+        %Refresh list of DetailNames
+        DetailName = dm.mDir.fetch('select fieldName from DetailName');
+    end
 
     
     %Record Details
@@ -43,8 +59,15 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     %Add missing Channels
     ChannelName = dm.mDir.fetch('select channelName from ChannelName');
     [~,indexMissing] = setxor(channels,ChannelName);
-    dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
-    ChannelName = dm.mDir.fetch('select channelName from ChannelName');
+    
+    %Check if no channels are missing
+    if ~isempty(indexMissing)
+        %Add Channels to ChannelName Table
+        dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
+        
+        %Refresh List of Channel Names
+        ChannelName = dm.mDir.fetch('select channelName from ChannelName');
+    end
     
     %Record Channels Logged
     [~, channelId] = union(channels,ChannelName);

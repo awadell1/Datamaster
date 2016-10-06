@@ -44,9 +44,9 @@ def getFileList():
     while True:
         # Grab a page of files from the server
         response = drive.files().list(q='fileExtension = \'ld\' or  fileExtension = \'ldx\'',
-                                      fields='nextPageToken, files(id, name, md5Checksum, createdTime)',
+                                      fields='nextPageToken, files(id, name, md5Checksum, modifiedTime)',
                                       pageSize=1000,
-                                      orderBy='createdTime',
+                                      orderBy='modifiedTime',
                                       pageToken=pageToken).execute()
 
         # Get the token for the next page

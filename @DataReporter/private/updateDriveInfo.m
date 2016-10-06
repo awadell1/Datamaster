@@ -3,8 +3,8 @@ function datasource = updateDriveInfo()
     import py.ConnectGoogleDrive.*
 
     % Only request new files from google if missing
-    persistent newFile
-    if isempty(newFile)
+    persistent newFile 
+    if isempty(newFile) || true
         fprintf('Polling Google Drive for new files...')
         newFile = cell(py.ConnectGoogleDrive.getFileList());
         fprintf('done\n')
@@ -45,7 +45,7 @@ function datasource = updateDriveInfo()
     files(~fileType) = []; fileType(~fileType) =[];
     
     %Sort by createdTime: Oldest First
-    [~,index] = sortrows({files.createdTime}');
+    [~,index] = sortrows({files.modifiedTime}');
     files = files(index); fileType = fileType(index);
     
     %Find all unique .ld files pick the oldest one as real
@@ -69,7 +69,7 @@ function datasource = updateDriveInfo()
         datasource(i).ld = files(ldIndex(i)).id;
         datasource(i).ldx = files(ldxIndex(i)).id;
         datasource(i).name = files(ldIndex(i)).name;
-        datasource(i).createdTime = files(ldIndex(i)).createdTime;
+        datasource(i).createdTime = files(ldIndex(i)).modifiedTime;
     end
   
     
