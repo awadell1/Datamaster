@@ -62,8 +62,14 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     
     %Check if no channels are missing
     if ~isempty(indexMissing)
-        %Add Channels to ChannelName Table
-        dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
+        %Add Channels to ChannelName Table -> Ensure channel is a column
+        %array
+        if size(channels,1) > size(channels,2)
+            dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing));
+        else
+            dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
+        end
+            
         
         %Refresh List of Channel Names
         ChannelName = dm.mDir.fetch('select channelName from ChannelName');
