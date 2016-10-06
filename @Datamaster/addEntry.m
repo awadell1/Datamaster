@@ -2,16 +2,16 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     
     %Turn off AutoCommit so changes happen all at once
     set(dm.mDir, 'AutoCommit', 'off');
-
-%     %Detirmine Creation Date for Log File
-%     if isfield(Details,'LogDate')
-%         %Extract the Date
-%         date = regexpi(Details.LogDate,'(\d{2})\\(\d{2})\\(\d{4})-');
-% 
-%         %Check if the creation time was also logged
-%         if isfield(Details,'LogTime')
-
-
+    
+    %     %Detirmine Creation Date for Log File
+    %     if isfield(Details,'LogDate')
+    %         %Extract the Date
+    %         date = regexpi(Details.LogDate,'(\d{2})\\(\d{2})\\(\d{4})-');
+    %
+    %         %Check if the creation time was also logged
+    %         if isfield(Details,'LogTime')
+    
+    
     %Create cell array of column names and values
     colNames = {'ldId', 'ldxId', 'OriginHash', 'FinalHash', 'Datetime'};
     values = {MoTeCFile.ld, MoTeCFile.ldx, MoTeCFile.OriginHash, FinalHash, MoTeCFile.createdTime};
@@ -36,7 +36,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         %Refresh list of DetailNames
         DetailName = dm.mDir.fetch('select fieldName from DetailName');
     end
-
+    
     
     %Record Details
     for i =1:length(fieldName)
@@ -44,18 +44,20 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         fieldId = find(strcmp(fieldName{i},DetailName));
         
         if isstruct(Details.(fieldName{i}))
-            dm.mDir.datainsert('DetailLog',{'entryId', 'fieldId', 'value', 'unit'},...
-             {datasourceId, fieldId, Details.(fieldName{i}).Value, Details.(fieldName{i}).Unit});
-%            dm.mDir.exec(sprintf('insert into DetailLog(entryId, fieldId, value, unit) VALUES(%f, %f, ''%s'', ''%s'')',...
-%                datasourceId, fieldId, Details.(fieldName{i}).Value, Details.(fieldName{i}).Unit));
+            %Check that Detail was actually logged
+            if ~isempty(Details.(fieldName{i}).Value)
+                dm.mDir.datainsert('DetailLog',{'entryId', 'fieldId', 'value', 'unit'},...
+                    {datasourceId, fieldId, Details.(fieldName{i}).Value, Details.(fieldName{i}).Unit});
+            end
         else
-            dm.mDir.datainsert('DetailLog',{'entryId', 'fieldId', 'value'},...
-             {datasourceId, fieldId, Details.(fieldName{i})});
-%            dm.mDir.exec(sprintf('insert into DetailLog(entryId, fieldId, value) VALUES(%f, %f, ''%s'')',...
-%                datasourceId, fieldId, Details.(fieldName{i})));
+            %Check that Details was actually logged
+            if ~isempty(Details.(fieldName{i}))
+                dm.mDir.datainsert('DetailLog',{'entryId', 'fieldId', 'value'},...
+                    {datasourceId, fieldId, Details.(fieldName{i})});
+            end
         end
     end
-
+    
     %Add missing Channels
     ChannelName = dm.mDir.fetch('select channelName from ChannelName');
     [~,indexMissing] = setxor(channels,ChannelName);
@@ -69,7 +71,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         else
             dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
         end
-            
+        
         
         %Refresh List of Channel Names
         ChannelName = dm.mDir.fetch('select channelName from ChannelName');
@@ -83,10 +85,10 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     end
     
     dm.mDir.fastinsert('ChannelLog',{'entryId','channelId'},data);
-
+    
     %Commit Changes to databse
     dm.mDir.commit;
-
+    
     %Turn AutoCommit back on
     set(dm.mDir, 'AutoCommit', 'on');
     
