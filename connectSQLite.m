@@ -32,11 +32,14 @@ function [SQLite_Database] = connectSQLite()
     %Open Connection
     SQLite_Database = database(dbpath, user, password, driver, url);
     
+    %Check that the connection was successful
+    assert(isa(SQLite_Database.Handle,'org.sqlite.SQLiteConnection'),...
+        'Unable to Connect to Database. Check your network connection');
+    
     %% Turn on Foriegn Key Support
     % Get a handle to the underlying JDBC connection
-    h = SQLite_Database.Handle;
-    % Create your own statement
-    s = h.createStatement;
+    s = SQLite_Database.Handle.createStatement;
+    
     % Use this statement to execute the query
     s.execute('PRAGMA foreign_keys=ON');
     % Close the statement

@@ -2,7 +2,6 @@ classdef datasource < handle
     %Class for structing MoTeC Log Data and supporting documentation
     
     properties (Access = public)
-        FinalHash = [];         %Final Hash of the datasource
         Data = struct;          %Stucture of Logged Data
         Entry = [];
     end

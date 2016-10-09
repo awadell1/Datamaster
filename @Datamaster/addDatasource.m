@@ -37,7 +37,7 @@ function FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
         %Add Details to temporary mat file
         ds.Details = Details;
         
-        %Resave temporary mat file using v7.3
+        %Resave temporary mat file using v7
         save(saveFile,'-struct','ds','-v7');
         
         %Compute Hash of Datasource

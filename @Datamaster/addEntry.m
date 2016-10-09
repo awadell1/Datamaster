@@ -78,7 +78,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     end
     
     %Record Channels Logged
-    [~, channelId] = union(channels,ChannelName);
+    [~, channelId] = intersect(channels,ChannelName);
     for i = 1:length(channelId)
         data{i,1} = datasourceId;
         data{i,2} = channelId(i);

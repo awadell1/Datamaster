@@ -9,4 +9,7 @@ function ds = getDatasource(dm,varargin)
     for i = 1:length(entry)
         ds(i) = datasource(dm,entry(i));
     end
+    
+    %Force to column 
+    ds = ds(:);
 end

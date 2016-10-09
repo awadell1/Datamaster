@@ -25,6 +25,9 @@ function [count,h,ax] = Histogram2(ds,varargin)
     Range = p.Results.Range;
     ax = p.Results.ax;
     
+    %Assert that some datasource match
+    assert(~isempty(ds),'No Matching Datasources Found');
+    
     %Set the Unit
     %Set Unit
     if isempty(p.Results.unit)
