@@ -7,12 +7,14 @@ SQLite Statements to recreate the database used by Datamaster
 PRAGMA foreign_keys = on;
 
 --Create Tables for Database
-CREATE TABLE masterDirectory(
-	id 				INTEGER 		PRIMARY KEY,
-	ldId			TEXT			NOT NULL,
-	ldxId			TEXT			NOT NULL,
-	OriginHash		TEXT			NOT NULL,
-	FinalHash		TEXT			NOT NULL
+CREATE TABLE `masterDirectory` (
+	`id`	INTEGER,
+	`ldId`	TEXT NOT NULL UNIQUE,
+	`ldxId`	TEXT NOT NULL UNIQUE,
+	`OriginHash`	TEXT NOT NULL UNIQUE,
+	`FinalHash`	TEXT NOT NULL UNIQUE,
+	`Datetime`	TEXT,
+	PRIMARY KEY(`id`)
 );
 
 CREATE TABLE DetailLog(

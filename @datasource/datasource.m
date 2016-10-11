@@ -20,7 +20,7 @@ classdef datasource < handle
         
         %Access Methods
         function channels = getLogged(ds)
-            channels = ds.Entry.Parameters(:);
+            channels = ds.Entry.Channel(:);
         end
         
         function detail = getDetails(ds,Detail)
@@ -33,7 +33,9 @@ classdef datasource < handle
                     %Clear Loaded Data from memory
                     ds.Data = struct;
                 case 2
-                    ds.Data = rmfield(ds.Data,varargin{1});
+                    if isfield(ds.Data,varargin{1})
+                        ds.Data = rmfield(ds.Data,varargin{1});
+                    end
             end
         end
         %Public Function Signitures
@@ -44,6 +46,8 @@ classdef datasource < handle
         openInMoTeC(ds)
         
         duration = driveTime(ds,varargin)
+        
+        Sync(varargin)
     end
     
     methods (Access = public)

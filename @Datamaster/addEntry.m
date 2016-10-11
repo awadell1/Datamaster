@@ -59,8 +59,12 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     end
     
     %Add missing Channels
-    ChannelName = dm.mDir.fetch('select channelName from ChannelName');
-    [~,indexMissing] = setxor(channels,ChannelName);
+    ChannelName = dm.mDir.fetch('select id, channelName from ChannelName');
+    if ~isempty(ChannelName)
+        [~,indexMissing] = setxor(channels,ChannelName(:,2));
+    else
+        indexMissing = true(length(channels),1);
+    end
     
     %Check if no channels are missing
     if ~isempty(indexMissing)
@@ -71,20 +75,17 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         else
             dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
         end
-        
-        
-        %Refresh List of Channel Names
-        ChannelName = dm.mDir.fetch('select channelName from ChannelName');
     end
     
     %Record Channels Logged
-    [~, channelId] = intersect(channels,ChannelName);
-    for i = 1:length(channelId)
-        data{i,1} = datasourceId;
-        data{i,2} = channelId(i);
+    query = cell(length(channels),1);
+    for i = 1:length(channels)
+        query{i} = sprintf(['INSERT INTO ChannelLog (entryId, channelId) ',...
+            'VALUES (%d, (SELECT id FROM ChannelName WHERE channelName = ''%s''));'],...
+            datasourceId,channels{i});
     end
-    
-    dm.mDir.fastinsert('ChannelLog',{'entryId','channelId'},data);
+    query = strjoin(query,'\n');
+    dm.mDir.exec(query);
     
     %Commit Changes to databse
     dm.mDir.commit;

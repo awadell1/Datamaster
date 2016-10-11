@@ -10,7 +10,7 @@ function [index] = getIndex(dm, varargin)
     % Input: channel must be a string (if one channel) or a cell array of strings
     %   Example: 'channel', {'Engine_RPM', 'Throttle_Pos'} or 'channel', 'Engine_RPM'
     %
-    % Output: 
+    % Output:
     % index: array of id intergers for Datasource from masterDirectory
     
     
@@ -45,6 +45,11 @@ function [index] = getIndex(dm, varargin)
     channel = p.Results.channel;
     StartDate = p.Results.StartDate;
     EndDate = p.Results.EndDate;
+    
+    %Force channel into a cell array
+    if ~isa(channel,'cell')
+        channel = {channel};
+    end
     
     if nargin == 1
         %If no arguments are supplied return everything
@@ -119,8 +124,10 @@ function [index] = getIndex(dm, varargin)
         %Combine Queries and get the list of Datasource that meet search criteria
         query = strjoin(fullQuery,' INTERSECT ');
         index = dm.mDir.fetch(query);
-        if ~isempty(index)
-            index = [index{:}]';
-        end
+    end
+    
+    %Convert to array
+    if ~isempty(index)
+        index = [index{:}]';
     end
 end
