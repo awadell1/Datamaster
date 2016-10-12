@@ -24,7 +24,7 @@ classdef datasource < handle
             channels = ds.Entry.Channel(:);
         end
         
-        function detail = getDetails(ds,Detail)
+        function detail = getDetail(ds,Detail)
             %Get a sepecfic detail from Detail Log
             
             %Assert that ds is singluar
