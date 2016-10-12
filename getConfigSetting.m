@@ -4,6 +4,7 @@ function [value] = getConfigSetting(Section,Key)
 
     %Expected filename for config file
     configFilename = 'config.ini';
+    defaultConfig = 'default.ini';
     
     %Create a config object for reading the .ini file
     persistent configSetting
@@ -11,8 +12,13 @@ function [value] = getConfigSetting(Section,Key)
         %Create an iniConfig object
         configSetting = IniConfig();
         
-        %Read the default config file
-        configSetting.ReadFile(configFilename);
+        %Use the default config file unless config.ini exist
+        if exist(configFilename,'file')
+            configSetting.ReadFile(configFilename);
+        else
+            assert(exist(defaultConfig,'file')==2, 'Missing the Default Config File');
+            configSetting.ReadFile(defaultConfig);
+        end
     end
     
     %Check if the requested key exists
@@ -34,10 +40,11 @@ function [value] = getConfigSetting(Section,Key)
             configSetting.AddKeys(Section,Key,value);
             configSetting.WriteFile(configFilename);
         end
+    else
+        %Get the Requested value
         value = configSetting.GetValues(Section,Key);
     end
 
-    %Get the Requested value
-    value = configSetting.GetValues(Section,Key);
+   
 end
 

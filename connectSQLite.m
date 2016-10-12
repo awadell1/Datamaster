@@ -7,9 +7,15 @@ function [SQLite_Database] = connectSQLite()
     
     %If it's not -> Add it
     if isempty([match{:}])
-        %Get the path to the sqlite-jbdc driver from the config settings
-        jbdc_path = getConfigSetting('sqlite-jdbc','jbdc_path');
-
+        %Set Default Path for sqlite-jbdc driver
+        jbdc_path = [fileparts(which('reportGitInfo')), '\Documentation'];
+        mkdir(jbdc_path);
+        jbdc_path = [jbdc_path, '\sqlite-jdbc.jar'];
+                
+        %Download from bitbucket
+        websave(jbdc_path,...
+            'https://bitbucket.org/xerial/sqlite-jdbc/downloads/sqlite-jdbc-3.14.2.1.jar');
+        
         %Add it to the dynamic path
         javaaddpath(jbdc_path);
 
