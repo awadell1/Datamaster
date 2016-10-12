@@ -177,7 +177,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(2, 3, nargin));
+            error(nargoutchk(2, 3, nargin));
             CheckIsString(file_name);
             
             if (nargin == 3)
@@ -215,7 +215,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - yes, 0 (false) - no
             % -------------------------------------------------------------
             
-            error(nargchk(2, 2, nargin));
+            error(nargoutchk(2, 2, nargin));
             
             section_names = DataToCell(section_names);
             
@@ -242,7 +242,7 @@ classdef IniConfig < handle
             %   count_sect - number of sections in configuration
             % -------------------------------------------------------------
             
-            error(nargchk(1, 1, nargin));
+            error(nargoutchk(1, 1, nargin));
             
             section_names = obj.config_data_array(obj.indicies_of_sections, 1);
 %             section_names = strrep(section_names, '[', '');
@@ -265,7 +265,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(2, 2, nargin));
+            error(nargoutchk(2, 2, nargin));
             
             section_names = DataToCell(section_names);
             
@@ -291,7 +291,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(3, 3, nargin));
+            error(nargoutchk(3, 3, nargin));
             
             positions = DataToCell(positions);
             section_names = DataToCell(section_names);
@@ -319,7 +319,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(2, 2, nargin));
+            error(nargoutchk(2, 2, nargin));
             
             section_names = DataToCell(section_names);
             
@@ -342,7 +342,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(3, 3, nargin));
+            error(nargoutchk(3, 3, nargin));
             
             old_section_names = DataToCell(old_section_names);
             new_section_names = DataToCell(new_section_names);
@@ -367,7 +367,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - yes, 0 (false) - no
             % -------------------------------------------------------------
             
-            error(nargchk(3, 3, nargin));
+            error(nargoutchk(3, 3, nargin));
             
             key_names = DataToCell(key_names);
             
@@ -394,7 +394,7 @@ classdef IniConfig < handle
             %   count_keys - number of keys in given section
             % -------------------------------------------------------------
             
-            error(nargchk(2, 2, nargin));
+            error(nargoutchk(2, 2, nargin));
             
             section_name = obj.validateSectionName(section_name);            
             [key_names, count_keys] = obj.getKeys(section_name);
@@ -422,7 +422,7 @@ classdef IniConfig < handle
             %   tf_set_values -- 1 (true): Success, status - 0 (false): Failed
             % -------------------------------------------------------------
             
-            error(nargchk(3, 5, nargin));
+            error(nargoutchk(3, 5, nargin));
             
             key_names = DataToCell(key_names);
             num_of_keys = numel(key_names);
@@ -472,7 +472,7 @@ classdef IniConfig < handle
             %   tf_set_values - 1 (true): Success, status - 0 (false): Failed
             % -------------------------------------------------------------
             
-            error(nargchk(4, 6, nargin));
+            error(nargoutchk(4, 6, nargin));
             
             key_positions = DataToCell(key_positions);
             key_names = DataToCell(key_names);
@@ -519,7 +519,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(3, 3, nargin));
+            error(nargoutchk(3, 3, nargin));
             
             key_names = DataToCell(key_names);
             
@@ -546,7 +546,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(4, 4, nargin));
+            error(nargoutchk(4, 4, nargin));
             
             old_key_names = DataToCell(old_key_names);
             new_key_names = DataToCell(new_key_names);
@@ -579,7 +579,7 @@ classdef IniConfig < handle
             %   status -- 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(2, 4, nargin));
+            error(nargoutchk(2, 4, nargin));
             
 %             if (nargin < 2)
 %                 % get all values
@@ -653,7 +653,7 @@ classdef IniConfig < handle
             %   status -- 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(4, 5, nargin));     
+            error(nargoutchk(4, 5, nargin));     
             
             key_names = DataToCell(key_names);
             num_of_keys = numel(key_names);
@@ -695,7 +695,7 @@ classdef IniConfig < handle
             
             %FIXME: возможно, нужно разбить этот метод на несколько, он слишком длинный 
             
-            error(nargchk(1, 2, nargin));
+            error(nargoutchk(1, 2, nargin));
             
             if (nargin < 2)
                 is_full_export = true;
@@ -794,7 +794,7 @@ classdef IniConfig < handle
             %   status - 1 (true) - success, 0 (false) - failed
             % -------------------------------------------------------------
             
-            error(nargchk(2, 2, nargin));
+            error(nargoutchk(2, 2, nargin));
             CheckIsString(file_name);
             
             fid = fopen(file_name, 'w');
