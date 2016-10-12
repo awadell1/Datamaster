@@ -12,6 +12,9 @@ function stats = RefreshDatastore(dr)
     
     %Assert that the host computer is a pc
     assert(ispc,'Only a pc can export MoTeC Log files')
+
+    %Change the working directory to the datamaster folder
+    cd(fileparts(which('reportGitInfo')));
     
     %Get all MoTeC Log files stored on google drive
     MoTeCFile = updateDriveInfo();

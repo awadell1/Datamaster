@@ -23,7 +23,7 @@ function channel = getChannel(ds,chanName,varargin)
         end
     else
         %Check if Channel has been loaded or filtering is set
-        if ~isfield(ds.Data,chanName) || ~isempty(filter)
+        if ~isfield(ds.Data,chanName) || ~strcmp(filter,'none')
             ds.clearData(chanName);
             ds.loadChannels(chanName);
         end
