@@ -1,4 +1,4 @@
-function Sync(ds, varargin)
+function timeNew = Sync(ds, varargin)
 	%Synchronizes the sampling rate of all opened channels
 
 	%Create Input Parser

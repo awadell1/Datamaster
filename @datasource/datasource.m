@@ -1,13 +1,12 @@
 classdef datasource < handle
     %Class for structing MoTeC Log Data and supporting documentation
     
-    properties (Access = public)
-        Data = struct;          %Stucture of Logged Data
-        Entry = [];
-    end
-    properties (Access = public)
-        dm = [];    %Handle to Datamaster Object
-        MatPath = '';    %Fullpath to .mat file
+    properties (Access = private)
+        Data = struct;          %Structure of Logged Data
+        Entry = struct;         %Structure of Details
+        Gate = struct;          %Sturcture for gating function
+        dm = [];                %Handle to Datamaster Object
+        MatPath = '';           %Fullpath to .mat file
     end
     
     methods
@@ -25,6 +24,10 @@ classdef datasource < handle
         
         function detail = getDetails(ds,Detail)
             detail = ds.Entry.Details.(Detail);
+        end
+
+        function Entry = getEntry(ds)
+            Entry = ds.Entry;
         end
         
         function clearData(ds,varargin)
@@ -47,7 +50,9 @@ classdef datasource < handle
         
         duration = driveTime(ds,varargin)
         
-        Sync(varargin)
+        newTime = Sync(varargin)
+
+        setGate(ds, filterHandle)
     end
     
     methods (Access = public)
