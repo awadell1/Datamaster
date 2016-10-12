@@ -7,7 +7,8 @@ function channel = getChannel(ds,chanName,varargin)
         p.FunctionName = 'Histogram2';
         p.addRequired('ds',@(x) isa(x,'datasource') && length(x)==1);
         p.addRequired('chanName',@(x) ischar(x) || iscell(x));
-        p.addOptional('filter',[],@(x) any(strcmp(x,{'none','hampel','median'})));
+        p.addOptional('filter', 'none', @(x) any(strcmp(x,{'none','hampel','median'})));
+        p.addOptional('gate', 'off', @(x) any(strcmp(x,{'off', 'on'})));
     end
     
     %Extract Parameters
@@ -46,6 +47,24 @@ function channel = getChannel(ds,chanName,varargin)
                     %Apply Filer
                     ds.Data.(chanName).Value = medfilt1(ds.Data.(chanName).Value,n);
             end
+        end
+
+        %% Apply Gating
+        switch p.Results.gate
+            case 'off'
+                %Do nothing
+            case 'on' || 'refresh'
+                %Refresh Gate if requested/required 
+                if strcmp(p.Results.gate, 'refresh') || isempty(ds.Gate.Value)
+                    ds. refreshGate;
+                end
+
+                %Find Samples to Drop
+                dropIndex = floor(interp1(ds.Gate.Time, 1* ds.Gate.Value, ds.Gate.(chanName).Time));
+
+                %Drop samples
+                ds.Data.(chanName).Value(dropIndex) = [];
+                ds.Data.(chanName).Time(dropIndex) = [];
         end
         
         %Return Channel

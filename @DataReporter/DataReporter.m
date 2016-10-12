@@ -10,20 +10,23 @@ classdef DataReporter
     
     methods
         function dr = DataReporter()
-            %Clean Up Datastore
-            dr.dm.Cleanup;
-            dr.dm.checkAllDatasourcesExist;
+            
         end
         
         %% Function Signitures
         stats = RefreshDatastore(dr)
         
+        
+        
         checkDetails(dr,hash);
     end
     
+    methods(Static)
+        [Details] = getDetails(idxFilename)
+    end
     methods(Static, Access = private)
         stats = RecursivelyOpen(s)
-        [success,FinalHash] = ExportDatasource(dataSource,s)
+        [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
     end
     
 end

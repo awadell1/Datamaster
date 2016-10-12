@@ -2,5 +2,17 @@ Datastore/
 *.asv
 *.mat
 
-#Ignore html folder
-html/
+#Ignore folders
+html/**
+__pycache__/**
+Dependencies/**
+
+#Ignore Config Files
+config.ini
+
+#Ignore zip folders
+*.zip
+
+#Ignore MoTeC Log Files
+*.ld
+*.ldx

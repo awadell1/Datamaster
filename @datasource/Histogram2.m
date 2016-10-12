@@ -25,6 +25,9 @@ function [count,h,ax] = Histogram2(ds,varargin)
     Range = p.Results.Range;
     ax = p.Results.ax;
     
+    %Assert that some datasource match
+    assert(~isempty(ds),'No Matching Datasources Found');
+    
     %Set the Unit
     %Set Unit
     if isempty(p.Results.unit)
@@ -46,35 +49,13 @@ function [count,h,ax] = Histogram2(ds,varargin)
     for i = 1:nDatasource
         %Check if datasourc has logged Parameter
         if any(strcmp(chanNameX,ds(i).getLogged)) && any(strcmp(chanNameY,ds(i).getLogged))
-            %Get Channels
-            channelX = ds(i).getChannel(chanNameX);
-            channelY = ds(i).getChannel(chanNameY);
+            %Load Required Channels and sync sampling Rates
+            ds(i).loadChannels({chanNameX, chanNameY});
+            ds(i).Sync;
             
-            %Upsample if needed otherwise just use raw data
-            if isequal(channelX.Time,channelY.Time)
-                %No Need for Interpolation
-                duration = duration + range(channelX.Time);
-                channelX = channelX.Value;
-                channelY = channelY.Value;
-            else
-                %Linearly Interpolate between points -> Use higher sampling channel for base time
-                if mean(diff(channelX.Time)) <= mean(diff(channelY.Time))
-                    %Use channelX as Basis
-                    duration = duration + range(channelX.Time);
-                    channelY = interp1(channelY.Time,channelY.Value,channelX.Time);
-                    channelX = channelX.Value;
-                else
-                    %Use ChannelY as Basis
-                    duration = duration + range(channelY.Time);
-                    channelX = interp1(channelX.Time,channelX.Value,channelY.Time);
-                    channelY = channelY.Value;
-                end
-
-                %Trim Extrapolated Points
-                trimNAN = isnan(channelX) | isnan(channelY);
-                channelX(trimNAN) = [];
-                channelY(trimNAN) = [];
-            end
+            %Get Channels
+            channelX = ds(i).getChannel(chanNameX).Value;
+            channelY = ds(i).getChannel(chanNameY).Value;
 
             %Bin logged data for each datasource
             count = histcounts2(channelX,channelY,edgesX,edgesY) + count;

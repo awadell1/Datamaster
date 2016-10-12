@@ -4,33 +4,29 @@ classdef Datamaster < handle
     % providing access to the datasource en mass
     
     properties (Access = private)
-        mDir = struct;             %Handle to the mat file storing information on all datasources
-        Datastore = nan;           %Location of the Datastore
-        mDirLoc = nan;             %Location of the master directory
+        mDir = connectSQLite;       %Connection Handle to the SQL Database
+        Datastore = nan             %Location of the Datastore
+        
+        Details = [];               %Stores a list of Details and their keys
+        Channels = [];              %Stores a list of Channels and their keys
         
         %Hashing Settings
         HashOptions = struct('Method','SHA-256',...
-                             'Format','hex',...
-                             'Input','file');
+            'Format','hex',...
+            'Input','file');
     end
     
     methods
         %% Class Constructor
-        function obj = Datamaster()
+        function dm = Datamaster()
             %Report Current Version info
             reportGitInfo;
             
-            %Set Relavant Locations
-            obj.Datastore = 'C:\Users\Alex\OneDrive\ARG17\Datamaster\Datastore\';
-            obj.mDirLoc = 'C:\Users\Alex\OneDrive\ARG17\Datamaster\Datastore\mDir.mat';
+            %Get a list of Details and Channels that have been logged
+            dm.updateDetails; dm.updateChannels;
             
-            %Connect to the Directory
-            if exist(obj.mDirLoc,'file')
-                load(obj.mDirLoc); obj.mDir = mDir;
-            else
-                obj.mDir = struct('Origin',{},'OriginHash',{},'FinalHash',{},...
-                    'Details',{},'Parameters',{});
-            end        
+            %Set Relavant Locations
+            dm.Datastore = getConfigSetting('Datastore','datastore_path');
         end
         
         %% Small Public Methods -> Move externally if it grows
@@ -39,30 +35,40 @@ classdef Datamaster < handle
             DatastorePath = obj.Datastore;
         end
         
-        function delete(obj)
-            %Method for deleteing Datamaster Object
-            
-            %Save Current Directory
-            obj.SaveDirectory;
-        end
-        
         function num = numEnteries(dm)
             %Returns the number of Datasources stored in the Datastore
             num = size(dm.mDir,2);
         end
+        
+        function dm = updateDetails(dm)
+            %Updates the list of details that have been logged in the
+            %database
+            dm.Details = dm.mDir.fetch(...
+                'SELECT DetailName.fieldName, DetailName.id FROM DetailName');
+        end
+        
+        function dm = updateChannels(dm)
+            %Updates the list of channels that have been logged in the
+            %database
+            dm.Channels = dm.mDir.fetch(...
+                'SELECT ChannelName.channelname, ChannelName.id FROM ChannelName');
+        end
+            
     end
     
     %% Function Signitures for Public Methods
     methods (Access = public)
-        [status,OriginHash] = CheckLogFileStatus(obj,LogFileLoc)
+        status = CheckLogFileStatus(obj,LogFileLoc)
         
-        FinalHash = addDatasource(obj,Origin,DatasourceLoc,Details)
+        FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
         
-        addEntry(obj,Origin,OriginHash,FinalHash,Details,Parameters)
+        addEntry(dm,MoTeCFile,FinalHash,Details,channels)
         
-        Datasource = getDatasource(obj,varargin)
+        Datasource = getDatasource(dm,varargin)
         
-        [Entry,index] = getEntry(varargin)
+        [Entry] = getEntry(dm,varargin)
+
+        [index] = getIndex(dm, varargin)
         
         removeEntry(obj,varagin)
         
@@ -75,7 +81,6 @@ classdef Datamaster < handle
         valid = validateHash(dm, hash)
         
         LoggedParameters = allLogged(dm,varargin)
-        
     end
     
 end
