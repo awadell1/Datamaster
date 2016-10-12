@@ -42,6 +42,7 @@ function [count,ax] = Histogram(ds,varargin)
     
     %Loop over each datasource
     nDatasource = length(ds);
+    textprogressbar('Processing Datasources: ', 'new');
     for i = 1:nDatasource
         %Check if datasourc has logged Parameter
         if any(strcmp(chanName,ds(i).getLogged))
@@ -53,11 +54,10 @@ function [count,ax] = Histogram(ds,varargin)
             ds(i).clearData;
         end
         
-        %Report Progress
-        if ~mod(i,100)
-            fprintf('%3.2f%% Complete\n',100*(i/nDatasource));
-        end
+        %Update progress bar
+        textprogressbar(100*i/nDatasource);
     end
+    textprogressbar('done');
     
     %Normalize Counts
     switch p.Results.Normalization

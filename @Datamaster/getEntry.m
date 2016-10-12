@@ -7,45 +7,38 @@ function [entry] = getEntry(dm,varargin)
     index = dm.getIndex(varargin{:});
     
     %% Create Enteries from database
-    query = sprintf(['SELECT ChannelLog.entryId, ChannelName.channelName FROM ChannelLog ',...
+    query = sprintf(['SELECT ChannelLog.entryId, group_concat(ChannelName.channelName) FROM ChannelLog ',...
         'INNER JOIN ChannelName ON ChannelName.id = ChannelLog.channelId ',...
-        'WHERE ChannelLog.entryId IN (%s)'], strjoin(sprintfc('%d',index),','));
+        'WHERE ChannelLog.entryId IN (%s) GROUP BY ChannelLog.entryId'],...
+        strjoin(sprintfc('%d',index),','));
     ChannelLog = dm.mDir.fetch(query);
     
-    DetailLog = dm.mDir.fetch(sprintf(['SELECT DetailLog.entryId, DetailName.fieldName, DetailLog.value, DetailLog.unit FROM DetailLog ',...
-        'INNER JOIN DetailName ON DetailName.id = DetailLog.fieldId ',...
-        'WHERE DetailLog.entryId IN (%s)'], strjoin(sprintfc('%d',index),',')));
     MasterLog = dm.mDir.fetch(sprintf(['SELECT id, OriginHash, FinalHash, Datetime FROM masterDirectory ',...
         'WHERE masterDirectory.id IN (%s)'], strjoin(sprintfc('%d',index),',')));
     
     % Create Enteries from Logs
-    entry = repmat(struct('OriginHash', [], 'FinalHash', [], 'channel', [], 'Detail', [], 'Datetime', []),[length(MasterLog),1]);
+    entry = repmat(struct('Index', [], 'OriginHash', [], 'FinalHash', [], 'Channel', [], 'Detail', [], 'Datetime', []),[length(MasterLog),1]);
     
     %If no entries were found skip
     if ~isempty(entry)
         %Extract entryId from ChannelLog
         channelEntryId = [ChannelLog{:,1}];
+        
+        %Preallocate MasterLogIndex for locating entries
+        MasterLogIndex = [MasterLog{:,1}];
         for i = 1:length(MasterLog)
             %Add Channels to entry
-            matchIndex = channelEntryId == index(i);
-            entry(i).Channel = ChannelLog(matchIndex,2);
+            matchIndex = channelEntryId == index(i);    %Find Record in ChannelLog
+            record = ChannelLog(matchIndex,2);    %Extract Channels from ChannelLog
+            record = textscan(record{:},'%s','Delimiter',','); %Extract channels to cell array
+            entry(i).Channel = record{:}; %Extract inner cell array
             
             %Add from MasterLog
-            masterIndex = [MasterLog{:,1}] == index(i);
+            masterIndex = MasterLogIndex == index(i);
+            entry(i).Index = MasterLog{masterIndex,1};
             entry(i).OriginHash = MasterLog{masterIndex,2};
             entry(i).FinalHash = MasterLog{masterIndex,3};
             entry(i).Datetime = MasterLog{masterIndex,4};
-            
-            %Addd from Details Log
-            detailIndex = [DetailLog{:,1}] == index(i);
-            for j = 1:length(detailIndex)
-                if strcmp(DetailLog{j,4},'null')
-                    entry(i).Detail.(DetailLog{j,2}) = DetailLog{j,3};
-                else
-                    entry(i).Detail.(DetailLog{j,2}).Value = DetailLog{j,3};
-                    entry(i).Detail.(DetailLog{j,2}).Unit = DetailLog{j,4};
-                end
-            end
         end
     end
 end

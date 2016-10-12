@@ -9,7 +9,6 @@ function [count,h,ax] = Histogram2(ds,varargin)
         p.addRequired('chanNameX',              @(x) ischar(x));
         p.addRequired('chanNameY',              @(x) ischar(x));
         p.addRequired('Range',                  @(x) isfloat(x) && all(size(x)==[2,2]));
-        p.addParameter('ax',         gca,       @(x) isa(x,matlab.graphics.axis.Axes));
         p.addParameter('unit',		   [],      @(x) iscell(x) && numel(x) == 2);
         p.addParameter('nBins',		   [50,50],        @(x) isfloat(x) && length(x)==2);
         p.addParameter('Normalization',     'pdf',...
@@ -23,7 +22,6 @@ function [count,h,ax] = Histogram2(ds,varargin)
     chanNameY = p.Results.chanNameY;
     nBins = p.Results.nBins;
     Range = p.Results.Range;
-    ax = p.Results.ax;
     
     %Assert that some datasource match
     assert(~isempty(ds),'No Matching Datasources Found');
@@ -42,10 +40,11 @@ function [count,h,ax] = Histogram2(ds,varargin)
     count = zeros(nBins(1),nBins(2));
     edgesX = linspace(Range(1,1),Range(1,2),nBins(1)+1);
     edgesY = linspace(Range(2,1),Range(2,2),nBins(2)+1);
-
+    
     duration = 0;
     %Loop over each datasource
     nDatasource = length(ds);
+    textprogressbar('Processing Datasources: ', 'new');
     for i = 1:nDatasource
         %Check if datasourc has logged Parameter
         if any(strcmp(chanNameX,ds(i).getLogged)) && any(strcmp(chanNameY,ds(i).getLogged))
@@ -56,7 +55,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
             %Get Channels
             channelX = ds(i).getChannel(chanNameX).Value;
             channelY = ds(i).getChannel(chanNameY).Value;
-
+            
             %Bin logged data for each datasource
             count = histcounts2(channelX,channelY,edgesX,edgesY) + count;
             
@@ -64,11 +63,10 @@ function [count,h,ax] = Histogram2(ds,varargin)
             ds(i).clearData;
         end
         
-        %Report Progress in 10% steps
-        if ~mod(i,100)
-            fprintf('%3.2f%% Complete\n',100*(i/nDatasource));
-        end
+        %Update progress bar
+        textprogressbar(100*i/nDatasource);
     end
+    textprogressbar('done');
     
     %Normalize Counts
     switch p.Results.Normalization
@@ -94,8 +92,9 @@ function [count,h,ax] = Histogram2(ds,varargin)
     
     %Due to the wide range of orders of magnitude-> take the log
     count = log10(count);
-
+    
     %Plot the histogram and turn of countour lines
+    figure
     xBarPoints = (edgesX(1:end-1) + edgesX(2:end))/2;
     yBarPoints = (edgesY(1:end-1) + edgesY(2:end))/2;
     [~,h] = contourf(xBarPoints,yBarPoints,count'); %Transpose as countourf and histocounts define x differently

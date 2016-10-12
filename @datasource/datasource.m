@@ -3,7 +3,9 @@ classdef datasource < handle
     
     properties (Access = private)
         Data = struct;          %Structure of Logged Data
-        Entry = struct;         %Structure of Details
+        Entry = struct;         %Structure of masterDirectory
+        Channel = {};           %Cell Array of logged channels
+        Detail = struct;        %Structure of Details
         Gate = struct;          %Sturcture for gating function
         dm = [];                %Handle to Datamaster Object
         MatPath = '';           %Fullpath to .mat file
@@ -23,11 +25,40 @@ classdef datasource < handle
         end
         
         function detail = getDetails(ds,Detail)
-            detail = ds.Entry.Details.(Detail);
+            %Get a sepecfic detail from Detail Log
+            
+            %Assert that ds is singluar
+            assert(length(ds) ==1, 'getDetails only supports singular datasources');
+            
+            %Load Details if missing
+            if isempty(ds.Details)
+                %Fetch Details from datastore
+                DetailLog = ds.dm.mDir.fetch(sprintf(['SELECT DetailLog.entryId, '...
+                    'DetailName.fieldName, DetailLog.value, DetailLog.unit FROM DetailLog ',...
+                    'INNER JOIN DetailName ON DetailName.id = DetailLog.fieldId ',...
+                    'WHERE DetailLog.entryId IN (%s)'], strjoin(sprintfc('%d',ds.Entry.Index),',')));
+                
+                %Add DetailLog records to Details
+                for j = 1:length(DetailLog)
+                    if strcmp(DetailLog{j,4},'null')
+                        ds.Detail.(DetailLog{j,2}) = DetailLog{j,3};
+                    else
+                        ds.Detail.(DetailLog{j,2}).Value = DetailLog{j,3};
+                        ds.Detail.(DetailLog{j,2}).Unit = DetailLog{j,4};
+                    end
+                end
+            end
+            
+            detail = ds.Detail.(Detail);
         end
-
-        function Entry = getEntry(ds)
-            Entry = ds.Entry;
+        
+        function entry = getEntry(ds)
+            
+            %Assert that ds is singluar
+            assert(length(ds) ==1, 'getDetails only supports singular datasources');
+            
+            %Return Entry
+            entry = ds.Entry;
         end
         
         function clearData(ds,varargin)
@@ -51,7 +82,7 @@ classdef datasource < handle
         duration = driveTime(ds,varargin)
         
         newTime = Sync(varargin)
-
+        
         setGate(ds, filterHandle)
     end
     
