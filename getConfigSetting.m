@@ -13,10 +13,10 @@ function [value] = getConfigSetting(Section,Key)
         configSetting = IniConfig();
         
         %Use the default config file unless config.ini exist
-        if exist(configFilename,'file'))
+        if exist(configFilename,'file')
             configSetting.ReadFile(configFilename);
         else
-            assert(exist(defaultConfig,'file)'), 'Missing the Default Config File');
+            assert(exist(defaultConfig,'file')==2, 'Missing the Default Config File');
             configSetting.ReadFile(defaultConfig);
         end
     end

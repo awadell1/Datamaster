@@ -10,7 +10,7 @@ function [SQLite_Database] = connectSQLite()
         %Set Default Path for sqlite-jbdc driver
         jbdc_path = [fileparts(which('reportGitInfo')), '\Documentation'];
         mkdir(jbdc_path);
-        jbdc_path = [jbdc_path, 'sqlite-jdbc.jar'];
+        jbdc_path = [jbdc_path, '\sqlite-jdbc.jar'];
                 
         %Download from bitbucket
         websave(jbdc_path,...
