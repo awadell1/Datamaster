@@ -19,7 +19,7 @@ Ready to get started with Datamaster? Here's how:
     * Click Add Folder...
     * Navigate to the Datamaster folder
     * Click Okay and approve the change
-6. Type the following command into MATLAB: `dm.getDatasource.Histogram2('Engine_RPM', 'Manifold_Pres',[0, 10000; 70 170])`
+6. Type the following command into MATLAB: `dm = Datamater; dm.getDatasource.Histogram2('Engine_RPM', 'Manifold_Pres',[0, 10000; 70 170])`
 7. Congrats! You now have Datamaster up and running, now go check out the ~~wiki~~ and get started analyzing data
 
 ## Bug Reporting ##
