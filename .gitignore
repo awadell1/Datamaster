@@ -16,3 +16,6 @@ config.ini
 #Ignore MoTeC Log Files
 *.ld
 *.ldx
+
+#Ignore some MATLAB files
+*.mex*
