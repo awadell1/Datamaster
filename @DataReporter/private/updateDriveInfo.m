@@ -4,7 +4,7 @@ function datasource = updateDriveInfo()
 
     % Only request new files from google if missing
     persistent newFile 
-    if isempty(newFile) || true
+    if isempty(newFile)
         fprintf('Polling Google Drive for new files...')
         newFile = cell(py.ConnectGoogleDrive.getFileList());
         fprintf('done\n')
