@@ -47,19 +47,19 @@ function [index] = getIndex(dm, varargin)
     EndDate = p.Results.EndDate;
     
     %Force channel into a cell array
-    if ~isa(channel,'cell')
+    if ~isa(channel,'cell') && ~isempty(channel)
         channel = {channel};
     end
     
     if nargin == 1
         %If no arguments are supplied return everything
-        index = dm.mDir.fetch('SELECT id FROM masterDirectory');
+        index = mksqlite(dm.mDir, 'SELECT id FROM masterDirectory');
     elseif ~strcmp(Hash,'')
         %Return Database enteries for that contain the supplied hash
         query = sprintf(['SELECT id FROM masterDirectory',...
             'WHERE masterDirectory.FinalHash IN (%s) OR',...
             'masterDirectory.OriginHash IN (%s) OR '],strjoin(Hash,','));
-        index = dm.mDir.fetch(query);
+        index = mksqlite(dm.mDir, query);
         
     else %Search by Request
         
@@ -123,11 +123,6 @@ function [index] = getIndex(dm, varargin)
         
         %Combine Queries and get the list of Datasource that meet search criteria
         query = strjoin(fullQuery,' INTERSECT ');
-        index = dm.mDir.fetch(query);
-    end
-    
-    %Convert to array
-    if ~isempty(index)
-        index = [index{:}]';
+        index = mksqlite(dm.mDir, query);
     end
 end

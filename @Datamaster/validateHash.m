@@ -18,7 +18,9 @@ function valid = validateHash(dm, hash)
             end
             
             %Valid Hashes Exist have enteries in the Master Directory
-            if ~any(strcmp(hash,{dm.mDir.OriginHash}) | strcmp(hash,{dm.mDir.FinalHash}))
+            if length(mksqlite(dm.mDir, sprintf(['SELECT id FROM masterDirectory ',...
+                'WHERE OriginHash = ''%s'' OR FinalHash = ''%s'''],...
+                hash, hash))) ~=1
                 valid = false;
             end
     end
