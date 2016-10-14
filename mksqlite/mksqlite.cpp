@@ -221,13 +221,6 @@ void mex_module_init()
             mexAtExit( mex_module_deinit );
             typed_blobs_init();
 
-            PRINTF( ::getLocaleMsg( MSG_HELLO ), 
-                    SQLITE_VERSION );
-
-            PRINTF( "Platform: %s, %s\n\n", 
-                    TBH_platform, 
-                    TBH_endian[0] == 'L' ? "little endian" : "big endian" );
-
             init_once = true;
         }
         else
