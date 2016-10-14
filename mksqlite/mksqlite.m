@@ -1,243 +1,234 @@
-%MKSQLITE Eine MATLAB Schnittstelle zu SQLite
-%  SQLite ist eine Embedded SQL Engine, welche ohne Server SQL Datenbanken
-%  innerhalb von Dateien verwalten kann. MKSQLITE bietet die Schnittstelle
-%  zu dieser SQL Datenbank.
+%MKSQLITE A MATLAB interface to SQLite
+%  SQLite is an embedded SQL Engine, which can be used to access SQL
+%  databases without a server.  MKSQLITE offers an interface to this
+%  database engine.
 %
-% Genereller Aufruf:
-%  dbid = mksqlite([dbid, ] SQLBefehl [, Argument])
-%    Der Parameter dbid ist optional und wird nur dann benötigt, wenn mit
-%    mehreren Datenbanken gleichzeitig gearbeitet werden soll. Wird dbid
-%    weggelassen, so wird automatisch die Datenbank Nr. 1 verwendet.
-%
-% Funktionsaufrufe:
-%  mksqlite('open', 'datenbankdatei')
-% oder
-%  dbid = mksqlite(0, 'open', 'datenbankdatei')
-% Öffnet die Datenbankdatei mit dem Dateinamen "datenbankdatei". Wenn eine
-% solche Datei nicht existiert wird sie angelegt.
-% Wenn eine dbid angegeben wird und diese sich auf eine bereits geöffnete
-% Datenbank bezieht, so wird diese vor Befehlsausführung geschlossen. Bei
-% Angabe der dbid 0 wird die nächste freie dbid zurück geliefert.
+% General calling sequence:
+%  dbid = mksqlite([dbid, ] SQLCommand [, Argument])
+%   The parameter dbid is optional and is only necessary if one is
+%   working with multiple databases at once.  If dbid is left out, then 
+%   database number 1 is used.
+% 
+% Function Calls:
+%  mksqlite('open', 'dataBaseName')
+% or
+%  dbid = mksqlite(0, 'open', 'dataBaseName')
+% Opens the database with name "dataBaseName".  If the database does
+% not exist, an empty one will be created.  If a dbid is given that is 
+% already open, it will be closed before opening again.  Providing a dbid 
+% of 0 will return the next free dbid.
 %
 %  mksqlite('close')
-% oder
+% or
 %  mksqlite(dbid, 'close')
-% oder
+% or
 %  mksqlite(0, 'close')
-% Schliesst eine Datenbankdatei. Bei Angabe einer dbid wird diese Datenbank
-% geschlossen. Bei Angabe der dbid 0 werden alle offenen Datenbanken
-% geschlossen.
+% Closes the database file. If a dbid is provided, the corresponding
+% database is closed.  For dbid 0, all open databases are closed.
 %
 %  mksqlite('version mex')                 (1
-% oder
+% or
 %  version = mksqlite('version mex')       (2
-% Gibt die Version von mksqlite in der Ausgabe (1), oder als String (2) zurück.
-%
+% Returns the version of mksqlite in the output (1), or as a string (2).
 %
 %  mksqlite('version sql')                 (1
-% oder
+% or
 %  version = mksqlite('version sql')       (2
-% Gibt die Version der verwendeten SQLite Engine in der Ausgabe (1),
-% oder als String (2) zurück.
+% Returns the version of the SQLite Engine in the output (1), or as a
+% string (2).
 %
-%  mksqlite('SQL-Befehl')
-% oder
-%  mksqlite(dbid, 'SQL-Befehl')
-% Führt SQL-Befehl aus.
+%  mksqlite('SQL-Command')
+% or
+%  mksqlite(dbid, 'SQL-Command')
+% Carries out the given "SQL-Command"
 %
-% Beispiel:
+% Example:
 %  mksqlite('open', 'testdb.db3');
 %  result = mksqlite('select * from testtable');
 %  mksqlite('close');
-% Liest alle Felder der Tabelle "testtable" in der Datenbank "testdb.db3"
-% in die Variable "result" ein.
+% Reads all fields from table "testtable" from the database "testdb.db3"
+% into the variable "result"
 %
-% Beispiel:
+% Example:
 %  mksqlite('open', 'testdb.db3')
 %  mksqlite('show tables')
 %  mksqlite('close')
-% Zeigt alle Tabellen in der Datenbank "testdb.db3" an.
+% Shows all tables in the database "testdb.db3"
 %
 % =====================================================================
 % Parameter binding:
-% Die SQL Syntax erlaubt die Verwendung von Parametern, die vorerst nur
-% durch Platzhalter gekennzeichnet und durch nachträgliche Argumente
-% mit Inhalten gefüllt werden.
-% Erlaubte Platzhalter in SQLlite sind: ?, ?NNN, :NNN, $NAME, @NAME
-% Ein Platzhalter kann nur für einen Wert (value) stehen, nicht für
-% einen Befehl, Spaltennamen, Tabelle, usw.
+% The SQL syntax allows the use of parameters, which are identified
+% by placeholders, and then filled with contents by trailing arguments.
+% Allowed placeholders in SQLlite are: ?, ?NNN, :NNN, $NAME, @NAME
+% A placeholder can only stand for one value, not for a command,
+% split-name, or table, etc.
 %
-% Beispiel:
-%  mksqlite( 'insert vorname, nachname, ort into Adressbuch values (?,?,?)', ...
-%            'Paul', 'Meyer', 'Muenchen' );
+% Example:
+%  mksqlite( 'insert firstName, lastName, city into AddressBook values (?,?,?)', ...
+%            'Paul', 'Meyer', 'Munich' );
 %
-% Statt einer Auflistung von Argumenten, darf auch ein CellArray übergeben
-% werden, dass die Argumente enthält.
-% Werden weniger Argumente übergeben als benötigt, werden die verbleibenden
-% Parameter mit NULL belegt. Werden mehr Argumente übergeben als
-% benötigt, bricht die Funktion mit einer Fehlermeldung ab.
-% Wenn statt dessen mit den übrigen Argumenten ein impliziter erneuter Aufruf
-% ausgeführt werden soll, so muss das so genannte Parameter Wrapping aktiviert
-% werden:
+% Instead of a listing of arguments, a cell array can be provided that 
+% contains the arguments.
+% If fewer arguments are given then required, the remaining parameters are 
+% filled with NULLs.  If more arguments are given than necessary, the
+% function reports an error.  
+% If it is intended, that implicit calls with the same command and the remaining
+% arguments shall be done, so called parameter wrapping must be activated:
 % mksqlite('param_wrapping', 0|1)
-% Ein Argument darf ein realer numerischer Wert (Skalar oder Array)
-% oder ein String sein. Nichtskalare Werte werden als Vektor vom SQL Datentyp
-% BLOB (uint8) verarbeitet. ( BLOB = (B)inary (L)arge (OB)ject) )
+% An argument may be a real value (scalar or array) or a string.  
+% Non-scalar values are treated as a BLOB (unit8) SQL datatype. 
+% ( BLOB = (B)inary (L)arge (OB)ject) )
 %
-% Beispiel:
+% Example:
 %  data = rand(10,15);
 %  mksqlite( 'insert data into MyTable values (?)', data );
 %  query = mksqlite( 'select data from MyTable' );
 %  data_sql = typecast( query(1).data, 'double' );
 %  data_sql = reshape( data_sql, 10, 15 );
 %
-% BLOBs werden immer als Vektor aus uint8 Werten in der Datenbank abgelegt.
-% Um wieder ursprüngliche Datenformate (z.B. double) und Dimensionen
-% der Matrix zu erhalten muss explizit typecast() und reshape() aufgerufen werden.
-% (Siehe hierzu auch das Beispiel "sqlite_test_bind.m")
-% Wahlweise kann diese Information (Typisierung) im BLOB hinterlegt werden.
-% Die geschilderte Nachbearbeitung ist dann zwar nicht mehr nötig, u.U. ist die
-% Datenbank jedoch nicht mehr kompatibel zu anderer Software!
-% Die Typisierung kann mit folgendem Befehl aktiviert/deaktiviert werden:
+% BLOBs are always stored as a vector of uint8 values in the database.
+% In order to retrieve the original format (for example, double) and
+% dimensions of the matrix, explict typecast() and reshape() functions
+% must be used. (Refer to the example "sqlite_test_bind.m")
+% Optionally this information (type) can be stored after the BLOB.
+% The indicated post-processing is then no longer necessary, but the
+% database is then no longer compatible with other software!
+% The typecasting conversion can be activated/deactivated with:
+%   
+%   mksqlite( 'typedBLOBs', 1 ); % activate
+%   mksqlite( 'typedBLOBs', 0 ); % deactivate
 %
-%   mksqlite( 'typedBLOBs', 1 ); % Aktivieren
-%   mksqlite( 'typedBLOBs', 0 ); % Deaktivieren
+% (see also the example "sqlite_test_bind_typed.m") 
+% Type conversion only works with numeric arrays and vectors.  structs,
+% cell arrays and complex data must be converted beforehand.  Matlab
+% can do this conversion through undocumented functions:
+% getByteStreamFromArray() and getArrayFromByteStream(). 
+% This functionality is activated by following command:
 %
-% (Siehe auch Beispiel "sqlite_test_bind_typed.m")
-% Typisiert werden nur numerische Arrays und Vektoren. Strukturen, Cellarrays
-% und komplexe Daten müssen vorher konvertiert werden. Matlab ist in der
-% Lage diese Konvertierung durch undokumentierte Funktionen zu übernehmen:
-% getByteStreamFromArray() und getArrayFromByteStream(). Die Funktionalität
-% wird durch folgenden Befehl aktiviert:
+%   mksqlite ( 'typedBLOBs', 2); % expanded activation
+% 
+% The data in a BLOB is stored either uncompressed (standard) or
+% compressed.  Automatic compression of the data is only necessary for
+% typed BLOBs, but must be activated:
 %
-%   mksqlite ( 'typedBLOBs', 2); % erweitertes Aktivieren
+%   mksqlite( 'compression', 'lz4', 9 ); % activate maximal compression (0=off)
 %
-%
-%
-% Die Daten in einem BLOB werden entweder unkomprimiert (Standard) oder komprimiert
-% abgelegt. Eine automatische Komprimierung der Daten ist nur für typisierte BLOBs
-% (s.o.) zulässig und muss zuvor aktiviert werden:
-%
-%   mksqlite( 'compression', 'lz4', 9 ); % Maximale Kompression aktivieren (0=aus)
-%
-% (Siehe auch Beispiel "sqlite_test_bind_typed_compressed.m" und
+% (See also examples "sqlite_test_bind_typed_compressed.m" and
 % "sqlite_test_md5_and_packaging.m")
-% Zur Komprimierung wird z.B. BLOSC (http://blosc.pytables.org/trac) verwendet.
-% Nach dem Komprimieren der Daten werden sie erneut entpackt und mit dem
-% Original verglichen. Weichen die Daten ab, wird eine entsprechende Fehlermeldung
-% ausgegeben. Wenn diese Funktionalität nicht gewünscht ist (Daten werden ungeprüft
-% gespeichert), kann sie auch deaktiviert werden:
+% 
+% The compression uses BLOSC (http://blosc.pytabales.org/trac)
+% After compression, the data is unpacked and compared with the original.
+% If there is a difference, an error report is given.  If this 
+% functionality is not desirable, it can be deactivated (data is 
+% stored without verification).
 %
-%   mksqlite( 'compression_check', 0 ); % Check deaktivieren (1=aktivieren)
+%   mksqlite( 'compression_check', 0 ); % deactive the check (1=activate)
 %
-% Kompatibilität:
-% Komprimiert abgelegte BLOBs können Sie nicht mit einer älteren Version von
-% mksqlite abrufen, es kommt dann zu einer Fehlermeldung. Unkomprimierte BLOBs
-% hingegen können auch mit der Vorgängerversion abgerufen werden.
-% Mit der Vorgängerversion gespeicherte BLOBs können Sie natürlich auch mit dieser
-% Version abrufen.
+% 
+% Compatibility:
+%  Stored compressed blobs cannot be retrieved with older versions of mqslite,
+%  this will trigger an error report.  In contrast, uncompressed BLOBS can be 
+%  retrieved with older versions.  Of course BLOBs stored with older versions
+%  can be retrieved with this version.
 %
-% Anmerkungen zur Kompressionsrate:
-% Die erzielbaren Kompressionsraten hängen stark vom Inhalt der Variablen ab.
-% Obwohl BLOSC für die Verwendung von Zahldatenformaten ausgelegt ist, ist die
-% Kompressionsrate für randomisierte Zahlen (double) schlecht (~95%).
-% Wenn viele gleiche Zahlen, z.B. durch Quantisierung, vorliegen wird die
-% Kompressionsrate deutlich besser ausfallen...
+% Remarks on compression rate:
+%   The achievable compression rates depend strongly on the contents of the 
+%   variables.  Although BLOSC is equipped to handle numeric data, its
+%   performance on randomized numbers (double) is poor (~95%).  If there are
+%   many identical values, for example from quantization, the compression rate
+%   is markedly improved.
 %
-% Weitere Kompressionsverfahren:
+% Further compression methods:
 % "QLIN16":
-% QLIN16 ist ein verlustbehaftetes Kompressionsverfahren. Die Daten werden
-% linear quantisiert (in 65529 Stufen diskretisiert) und als 16-Bit Wert
-% gespeichert. Die Null, sowie Infinity und NaN können überdies verwendet
-% werden, da sie als spezielle Zahl (65529..65535) abgelegt werden.
-% Unterschiedliche Kompressionsraten werden nicht unterstützt, sie sollte
-% für diesen Kompressor immer auf 1 gesetzt werden.
-%
+% QLIN16 is a lossy compression method.  The data is linearly discretized
+% to 65529 steps and stored as 16-bit values.  Zero, as well as Infinity and Nan
+% can also be used, as they are stored as special values (65529...65535).
+% Differing compression rates are not supported, so this compressor should
+% always be set to 1.
+% 
 % "QLOG16":
-% Arbeitet wie QLIN16, die Quantisierung erfolgt jedoch über die
-% logarithmierten Werte, daher sind hier keine negativen Werte erlaubt.
-% Null, NaN und Infinity werden trotzdem akzeptiert.
-% Unterschiedliche Kompressionsraten werden auch hier nicht unterstützt,
-% sie sollten ebenfalls immer auf 1 gesetzt werden.
-%
+% Works like QLIN16, except that the quantization uses logarithmic
+% scaling, therefore storage of negative values is not allowed, but
+% NULL, Nan, and infinity are still accepted.  Similarly, differing
+% compression rates are not supported, so should always be set to 1.
+% 
 % =======================================================================
 %
-% Steuerung der Rückgabewerte von Queries
+% Control the format of result for queries
 %
-% Neben der beschrieben Aufrufform der Art result = mksqlite(...) können
-% zwei weitere Ergebnisse abgefragt werden, die häufig gefragt sind:
-% 1. Die Anzahl der Zeilen  (rowcount)
-% 2. Die original Spaltenüberschriften der Tabelle (colnames)
-% Beide Ergebnisse werden mit dem gewöhnlichen Aufruf bereits übergeben:
+% Beside the described calling convention, one can retrieve two further
+% often needed results:
+% 1. The row count (rowcount)
+% 2. The original table column names (colnames)
+% Both results are given with the common call already:
 % [result,rowcount,colnames] = mksqlite(...)
 %
-% Per Voreinstellung wird ein Strukturarray (array of structs) zurückgegeben.
-% Wahlweise sind insgesamt drei Rückgabetypen möglich:
-% (0) array of structs (Vorgabe)
+% Per default an array of structs will be returned for table queries.
+% You can decide between three differet kinds of result types:
+% (0) array of structs (default)
 % (1) struct of arrays
 % (2) cell matrix
-% Die Voreinstellung (n=0) kann mit folgendem Befehl geändert werden:
+% You can change the default setting (n=0) with following call:
 % mksqlite( 'result_type', n );
 % (see sqlite_test_result_types.m)
 %
 % =======================================================================
 %
-% Builtin SQL Funktionen:
-% mksqlite bietet zusätzliche SQL Funktionen neben der bekannten "core functions"
-% wie replace,trim,abs,round,...
-% In dieser Version werden 10 weitere Funktionen angeboten:
+% Extra SQL functions:
+% mksqlite offers additional SQL functions besides the known "core functions"
+% like replace, trim, abs, round, ...
+% This version offers 10 additional functions:
 %   * pow(x,y):
-%     Berechnet x potenziert um den Exponenten y. Ist der Zahlenwert des Ergebnisses
-%     nicht darstellbar ist der Rückgabewert NULL.
+%     Calculates x raised to exponent y.  If the result is not representable
+%     the return value is NULL.
 %   * lg(x):
-%     Berechnet den dekadischen Logarithmus von x. Ist der Zahlenwert des Ergebnisses
-%     nicht darstellbar ist der Rückgabewert NULL.
+%     Calculates the decadic logarithm of x. If the result is not representable
+%     the return value is NULL.
 %   * ln(x):
-%     Berechnet den natürlichen Logarithmus von x. Ist der Zahlenwert des Ergebnisses
-%     nicht darstellbar ist der Rückgabewert NULL.
+%     Calculates the natural logarithm of x. If the result is not representable
+%     the return value is NULL.
 %   * exp(x):
-%     Berechnet die Potenz der Basis e um den Exponenten x. Ist der Zahlenwert des Ergebnisses
-%     nicht darstellbar ist der Rückgabewert NULL.
+%     Calculates the exponential function with e raised x. If the result is not representable
+%     the return value is NULL.
 %   * regex(str,pattern):
-%     Ermittelt den ersten Teilstring von str, der dem Regulären Ausdruck pattern
-%     entspricht.
+%     Finds the first substring of str that matches the regular expression pattern.
 %   * regex(str,pattern,repstr):
-%     Ermittelt den ersten Teilstring von str, der dem Regulären Ausdruck pattern
-%     entspricht. Der Rückgabewert wird jedoch durch die neue Zusammensetzungsvorschrift
-%     repstr gebildet.
-%     (mksqlite verwendet die perl kompatible regex engine "DEELX".
-%     Weiterführende Informationen siehe www.regexlab.com oder wikipedia)
+%     Finds the first substring of str, that  matches the regular expression pattern.
+%     The return value replaces the value with repstr.
+%     (mksqlite uses the perl-compatible regex engine "DEELX".
+%     Further information can be found at www.regexlab.com or wikipedia)
 %   * md5(x):
-%     Es wird der MD5 Hashing Wert von x berechnet und ausgegeben.
+%     Computes and returns the MD5 hash
 %   * bdcpacktime(x):
-%     Berechnet die erforderliche Zeit um x mit dem aktuellen Kompressor
-%     und der eingestellten Konpression zu packen (Nettozeit)
+%     Computes the required time for the actual compression of x.
 %   * bdcunpacktime(x):
-%     Das Äquivalent zu bdcpacktime(x).
+%     Equivalent to bdcpacktime(x). (but for unpacking?)
 %   * bdcratio(x):
-%     Berechnet den Kompressionsfaktor, bezogen auf x und die derzeit
-%     eingestellte Kompression.
+%     Computes the compression factor for x, using the currently set
+%     compression method.
 %
-% Die Verwendung von regex in Kombination mit parametrischen Parametern bieten eine
-% besonders effiziente Möglichkeit komplexe Abfragen auf Textinhalte anzuwenden.
-% Beispiel:
+% The use of regex in combination with parameters offers an
+% especially efficient possibility for complex queries on text contents.
+%
+% Example:
 %   mksqlite( [ 'SELECT REGEX(field1,"[FMA][XYZ]MR[VH][RL]") AS re_field FROM Table ', ...
 %               'WHERE REGEX(?,?,?) NOT NULL' ], 'field2', '(\\d{5})_(.*)', '$1' );
 %
-% (siehe auch test_regex.m für weitere Beispiele...)
+% (also see test_regex.m for further examples...)
 %
 % =======================================================================
 %
-% Application-defined Funktionen:
-% Weitere Funktionen koennen mit eine der beiden Aufrufen installiert werden:
+% Application-defined functions:
+% You can register your own MATLAB functions as SQL functions with one of
+% the following calls:
 % 
 %   mksqlite( 'create function', <name>, function_handle );
 %   mksqlite( 'create aggregation', <name>, step_function_handle, final_function_handle );
 %
-% So koennen MATLAB Funktionen ueber deren Handle in SQL zugaenglich gemacht werden.
+% So you can access your MATLAB code from within SQL queries.
 %
 %
-% (c) 2008-2016 by Martin Kortmann <mail@kortmann.de>
+% (c) 2008-2015 by Martin Kortmann <mail@kortmann.de>
 %                  Andreas Martin  <andimartin@users.sourceforge.net>
 %
 
