@@ -37,38 +37,34 @@ function [count,h,ax] = Histogram2(ds,varargin)
     end
     
     %Initialize arrays
-    count = zeros(nBins(1),nBins(2));
     edgesX = linspace(Range(1,1),Range(1,2),nBins(1)+1);
     edgesY = linspace(Range(2,1),Range(2,2),nBins(2)+1);
     
-    duration = 0;
-    %Loop over each datasource
-    nDatasource = length(ds);
-    textprogressbar('Processing Datasources: ', 'new');
-    for i = 1:nDatasource
-        %Check if datasourc has logged Parameter
-        if any(strcmp(chanNameX,ds(i).getLogged)) && any(strcmp(chanNameY,ds(i).getLogged))
-            %Load Required Channels and sync sampling Rates
-            ds(i).loadChannels({chanNameX, chanNameY});
-            ds(i).Sync;
-            
-            %Get Channels
-            channelX = ds(i).getChannel(chanNameX).Value;
-            channelY = ds(i).getChannel(chanNameY).Value;
-            
-            %Bin logged data for each datasource
-            count = histcounts2(channelX,channelY,edgesX,edgesY) + count;
-            
-            %Clear data to preserve RAM
-            ds(i).clearData;
-        end
-        
-        %Update progress bar
-        textprogressbar(100*i/nDatasource);
-    end
-    textprogressbar('done');
+    %% Process Datasource
+    [count,duration] = mapReduce(ds, @mapFun,...
+        @reduceFun, {chanNameX, chanNameY});
     
-    %Normalize Counts
+    %Define mapFun
+    function [count, duration] = mapFun(ds)
+        %Load Required Channels and sync sampling Rates
+        ds.loadChannels({chanNameX, chanNameY});
+        ds.Sync;
+        
+        %Get Channels
+        channelX = ds.getChannel(chanNameX).Value;
+        channelY = ds.getChannel(chanNameY).Value;
+        
+        count = histcounts2(channelX,channelY,edgesX,edgesY);
+        duration = range(ds.getChannel(chanNameX).Time);
+    end
+    
+    %Define Reduce Function
+    function [count, duration] = reduceFun(count, duration)
+        count = sum(cat(3,count{:}),3);
+        duration = sum([duration{:}]);
+    end
+    
+    %% Normalize Counts
     switch p.Results.Normalization
         case 'pdf'
             %Compute Area of each bin
@@ -114,3 +110,4 @@ function [count,h,ax] = Histogram2(ds,varargin)
     xlabel(sprintf('%s [%s]',chanNameX,unit{1}),'interpreter','none')
     ylabel(sprintf('%s [%s]',chanNameY,unit{2}),'interpreter','none')
     title(sprintf('Based on %3.2f hrs of data',duration/3600));
+end
