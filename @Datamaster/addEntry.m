@@ -9,7 +9,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
             dm.mDir.execute('ROLLBACK');
             dm.mDir.execute('BEGIN');
         end
-            
+        
         
         %Create cell array of column names and values
         colNames = {'ldId', 'ldxId', 'OriginHash', 'FinalHash', 'Datetime'};
@@ -20,17 +20,19 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         
         %Get id for datasource
         query = sprintf('select id from MasterDirectory where FinalHash=''%s''',FinalHash);
-        datasourceId = dm.mDir.fetch(query);
+        datasourceId = dm.mDir.fetch(query); datasourceId = datasourceId{:};
         
         %Add Missing Names to Details Logged
-        DetailName = m.mDir.fetch('select fieldName from DetailName');
+        DetailName = dm.mDir.fetch('select fieldName from DetailName');
         fieldName = fieldnames(Details); fieldName = fieldName(:);
         [~,indexMissing] = setxor(fieldName,DetailName);
         
         %Check if no Detail Names are missing
         if ~isempty(indexMissing)
             %Add missing Detail names to the DetailName table
-            fastinsert(dm.mDir, 'DetailName', fieldName, fieldName(indexMissing))
+            for i = 1:length(indexMissing)
+                fastinsert(dm.mDir, 'DetailName', 'fieldName', fieldName(indexMissing(i)))
+            end
         end
         
         
@@ -40,28 +42,28 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
                 %Check that Detail was actually logged
                 if ~isempty(Details.(fieldName{i}).Value)
                     %Add Entry to datastore
-                    dm.mDir.execute(sprintf(['INSERT INTO DetailLog (entryId, value, unit, fieldId) ',...
-                        'VALUES (%d, ''%s'', ''%s'', (SELECT id FROM DetailName WHERE fieldName = ''%s''))'],...
+                    dm.mDir.execute(['INSERT INTO DetailLog (entryId, value, unit, fieldId) ',...
+                        'VALUES (?, ?, ?, (SELECT id FROM DetailName WHERE fieldName = ?))'],...
                         datasourceId,...
                         Details.(fieldName{i}).Value, Details.(fieldName{i}).Unit,...
-                        fieldName{i}));
+                        fieldName{i});
                 end
             else
                 %Check that Details was actually logged
                 if ~isempty(Details.(fieldName{i}))
                     %Add Entry to datastore
-                    dm.mDir.execute(sprintf(['INSERT INTO DetailLog (entryId, value, fieldId) ',...
-                        'VALUES (%d, ''%s'', (SELECT id FROM DetailName WHERE fieldName = ''%s''))'],...
+                    dm.mDir.execute(['INSERT INTO DetailLog (entryId, value, fieldId) ',...
+                        'VALUES (?, ?, (SELECT id FROM DetailName WHERE fieldName = ?))'],...
                         datasourceId,...
                         Details.(fieldName{i}),...
-                        fieldName{i}));
+                        fieldName{i});
                 end
-
+                
             end
         end
         
         %Add missing Channels
-        ChannelName = m.mDir.fetch('select id, channelName from ChannelName');
+        ChannelName = dm.mDir.fetch('select id, channelName from ChannelName');
         if ~isempty(ChannelName)
             [~,indexMissing] = setxor(channels,ChannelName(:,2));
         else
@@ -72,37 +74,38 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         if ~isempty(indexMissing)
             %Add Channels to ChannelName Table -> Ensure channel is a column
             %array
-            fastinsert(dm.mDir, 'ChannelName', 'channelName', channels(indexMissing));
-            %if size(channels,1) > size(channels,2)
-            %    dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing));
-            %else
-            %    dm.mDir.fastinsert('ChannelName',{'channelName'},channels(indexMissing)');
-            %end
+            for i = 1:length(indexMissing)
+new                dm.mDir.execute('INSERT INTO ChannelName (channelName) VALUES (?)', channels(indexMissing(i)));
+            end
         end
         
         %Record Channels Logged
-        query = cell(length(channels),1);
         for i = 1:length(channels)
-            query{i} = sprintf(['INSERT INTO ChannelLog (entryId, channelId) ',...
+            query = sprintf(['INSERT INTO ChannelLog (entryId, channelId) ',...
                 'VALUES (%d, (SELECT id FROM ChannelName WHERE channelName = ''%s''));'],...
                 datasourceId,channels{i});
+            dm.mDir.execute(query)
         end
-        query = strjoin(query,'\n');
-        dm.mDir.execute(query);
         
         %Commit Changes to databse
         dm.mDir.execute('COMMIT');
     catch e
         %If something goes wrong -> roll back changes
-        mksqlite('ROLLBACK');
+        dm.mDir.execute('ROLLBACK');
         
         %Rethrow error
         rethrow(e);
     end
 end
 
-function fastinsert(dbid, table, fieldnames, values)
+function fastinsert(conn, table, fieldnames, values)
     %Helper function for adding entries to the datastore
-    dm.mDir.execute(sprintf('INSERT INTO %s (%s) VALUES (''%s'')',...
+    if ischar(values)
+        values = {values};
+    end
+    if ischar(fieldnames)
+        fieldnames = {fieldnames};
+    end
+    conn.execute(sprintf('INSERT INTO %s (%s) VALUES (''%s'')',...
         table, strjoin(fieldnames,','), strjoin(values,''',''')));
 end

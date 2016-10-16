@@ -3,7 +3,7 @@ function LoggedParameters = allLogged(dm,varargin)
     % Datasources. Uses getEntry to provide search
     
     %Get a list of all logged channels
-    LoggedParameters = m.mDir.fetch(['SELECT channelName FROM ChannelName'...
+    LoggedParameters = dm.mDir.fetch(['SELECT channelName FROM ChannelName'...
         ' ORDER BY channelName']);
 end
 

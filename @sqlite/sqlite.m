@@ -12,8 +12,23 @@ classdef sqlite
             obj.conn = py.sqlite3.connect(dbpath);
         end
         
-        function execute(obj, SQLQuery)
-            obj.conn.execute(SQLQuery);
+        function execute(obj, SQLQuery, varargin)
+            try
+                if numel(varargin) > 1
+                    obj.conn.execute(SQLQuery, varargin);
+                else
+                    obj.conn.execute(SQLQuery, py.list(varargin{:}));
+                end
+            catch pyE
+                e.message = sprintf('SQL Query Failed: %s\n%s',...
+                    SQLQuery, pyE.message);
+                e.identifier = 'Datamaster:sqlite:execute';
+                error(e);
+            end
+        end
+        
+        function executemany(obj, SQLQuery, varargin)
+            obj.conn.executemany(SQLQuery,varargin)
         end
         
         function record = fetch(obj, SQLQuery)
@@ -23,14 +38,18 @@ classdef sqlite
             
             %Convert py.list to cell
             results = cell(results);
-            record = cell(length(results),length(results{1}));
-            for i = 1:length(results)
-                record(i,:) = cell(results{i});
+            if ~isempty(results)
+                record = cell(length(results),length(results{1}));
+                for i = 1:length(results)
+                    record(i,:) = cell(results{i});
+                end
+                
+                %Convert python datatypes to matlab
+                record = cellfun(@py2Mat,record, 'UniformOutput',0);
+            else
+                record = [];
             end
-            
-            %Convert python datatypes to matlab
-            record = cellfun(@py2Mat,record, 'UniformOutput',0);
-        end        
+        end
     end
 end
 

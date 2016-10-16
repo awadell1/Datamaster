@@ -7,8 +7,9 @@ function [SQLite_Database] = connectSQLite()
     %Check if python is installed
     if isempty(pyversion)
         fprintf(['Please install <a href="https://www.python.org/">python</a>\n',...
-            'Be sure to check the option to "Add Python to Path"\n']);
-        error('Datamaster requires python');
+            'Be sure to check the option to "Add Python to Path"\n'...
+            'Python can be found at the above link or www.python.org\n']);
+        error('Datamaster requires <a href="https://www.python.org/">python</a>');
     end
     
     %Check if dbpath exist
