@@ -31,8 +31,8 @@ function [index] = getIndex(dm, varargin)
         addParameter(p,'channel',   [],     @(x) ischar(x) || iscell(x));
         
         % Add a Parameter to a date range of intererst
-        addParameter(p,'StartDate', [],     @(x) validateDate(x));
-        addParameter(p,'EndDate',   [],     @(x) validateDate(x));
+        addParameter(p,'StartDate', [],     @(x) true || validateDate(x));
+        addParameter(p,'EndDate',   [],     @(x) true || validateDate(x));
         
         % Add Parameters to control how many results are returned
         addParameter(p,'Return',    [],         @isfloat);
@@ -53,13 +53,13 @@ function [index] = getIndex(dm, varargin)
     
     if nargin == 1
         %If no arguments are supplied return everything
-        index = mksqlite(dm.mDir, 'SELECT id FROM masterDirectory');
+        index = dm.mDir.fetch('SELECT id FROM masterDirectory');
     elseif ~strcmp(Hash,'')
         %Return Database enteries for that contain the supplied hash
         query = sprintf(['SELECT id FROM masterDirectory',...
             'WHERE masterDirectory.FinalHash IN (%s) OR',...
             'masterDirectory.OriginHash IN (%s) OR '],strjoin(Hash,','));
-        index = mksqlite(dm.mDir, query);
+        index = dm.mDir.fetch(query);
         
     else %Search by Request
         
@@ -93,22 +93,22 @@ function [index] = getIndex(dm, varargin)
         %% Search by Datetime
         
         % Convert to datetime if needed
-        if ischar(StartDate)
-            StartDate = datetime(StartDate,'format','MM/dd/uu');
-        end
-        if ischar(EndDate)
-            EndDate = datetime(EndDate,'format','MM/dd/uu');
-        end
+        %         if ischar(StartDate)
+        %             StartDate = datetime(StartDate,'format','MM/dd/uu');
+        %         end
+        %         if ischar(EndDate)
+        %             EndDate = datetime(EndDate,'format','MM/dd/uu');
+        %         end
         
         if ~isempty(StartDate) && ~isempty(EndDate)
             fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM masterDirectory ',...
-                'WHERE Datetime BETWEEN %s AND %s'], StartDate, EndDate);
+                'WHERE Datetime BETWEEN ''%s'' AND ''%s'''], StartDate, EndDate);
         elseif ~isempty(StartDate)
-            fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM masterDirectory',...
-                'WHERE Datetime >= %s'],StartDate);
+            fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM masterDirectory ',...
+                'WHERE Datetime >= ''%s'''],StartDate);
         elseif ~isempty(EndDate)
-            fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM masterDirectory',...
-                'WHERE Datetime <= %s'],EndDate);
+            fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM masterDirectory ',...
+                'WHERE Datetime <= ''%s'''],EndDate);
         end
         
         %% Search by Parameters
@@ -123,6 +123,11 @@ function [index] = getIndex(dm, varargin)
         
         %Combine Queries and get the list of Datasource that meet search criteria
         query = strjoin(fullQuery,' INTERSECT ');
-        index = mksqlite(dm.mDir, query);
+        index = dm.mDir.fetch(query);
+    end
+    
+    %Convert to numerical array
+    if ~isempty(index)
+        index = [index{:}]';
     end
 end

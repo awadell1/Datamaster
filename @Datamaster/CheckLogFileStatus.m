@@ -9,11 +9,11 @@ function status = CheckLogFileStatus(dm,item)
     
     %Find Records with a matching origin hash
     query = sprintf('select id from masterDirectory where OriginHash=''%s''',item.OriginHash);
-    OriginMatch = mksqlite(dm.mDir, query);
+    OriginMatch = m.mDir.fetch(query);
     
     %Find Records with matching .ld or .ldx files
     query = sprintf('select id from masterDirectory where ldId=''%s'' OR ldxId=''%s''',item.ld,item.ldx);
-    PathMatch = mksqlite(dm.mDir, query);
+    PathMatch = m.mDir.fetch(query);
     
     %% Detirmine Status of Log File
     if isempty(OriginMatch)

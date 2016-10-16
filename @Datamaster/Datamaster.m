@@ -43,15 +43,13 @@ classdef Datamaster < handle
         function dm = updateDetails(dm)
             %Updates the list of details that have been logged in the
             %database
-            dm.Details = mksqlite(dm.mDir,...
-                'SELECT DetailName.fieldName, DetailName.id FROM DetailName');
+            dm.Details = dm.mDir.fetch('SELECT DetailName.fieldName, DetailName.id FROM DetailName');
         end
         
         function dm = updateChannels(dm)
             %Updates the list of channels that have been logged in the
             %database
-            dm.Channels = mksqlite(dm.mDir,...
-                'SELECT ChannelName.channelname, ChannelName.id FROM ChannelName');
+            dm.Channels = dm.mDir.fetch('SELECT ChannelName.channelname, ChannelName.id FROM ChannelName');
         end
             
     end

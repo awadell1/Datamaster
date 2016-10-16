@@ -3,11 +3,11 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         
         %Start SQL Transaction
         try
-            mksqlite(dm.mDir, 'BEGIN');
+            dm.mDir.execute('BEGIN');
         catch
             %Catch errors caused by old transactions
-            mksqlite(dm.mDir, 'ROLLBACK');
-            mksqlite(dm.mDir, 'BEGIN');
+            dm.mDir.execute('ROLLBACK');
+            dm.mDir.execute('BEGIN');
         end
             
         
@@ -20,10 +20,10 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         
         %Get id for datasource
         query = sprintf('select id from MasterDirectory where FinalHash=''%s''',FinalHash);
-        datasourceId = mksqlite(dm.mDir, query);
+        datasourceId = dm.mDir.fetch(query);
         
         %Add Missing Names to Details Logged
-        DetailName = mksqlite(dm.mDir, 'select fieldName from DetailName');
+        DetailName = m.mDir.fetch('select fieldName from DetailName');
         fieldName = fieldnames(Details); fieldName = fieldName(:);
         [~,indexMissing] = setxor(fieldName,DetailName);
         
@@ -40,7 +40,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
                 %Check that Detail was actually logged
                 if ~isempty(Details.(fieldName{i}).Value)
                     %Add Entry to datastore
-                    mksqlite(dm.mDir, sprintf(['INSERT INTO DetailLog (entryId, value, unit, fieldId) ',...
+                    dm.mDir.execute(sprintf(['INSERT INTO DetailLog (entryId, value, unit, fieldId) ',...
                         'VALUES (%d, ''%s'', ''%s'', (SELECT id FROM DetailName WHERE fieldName = ''%s''))'],...
                         datasourceId,...
                         Details.(fieldName{i}).Value, Details.(fieldName{i}).Unit,...
@@ -50,7 +50,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
                 %Check that Details was actually logged
                 if ~isempty(Details.(fieldName{i}))
                     %Add Entry to datastore
-                    mksqlite(dm.mDir, sprintf(['INSERT INTO DetailLog (entryId, value, fieldId) ',...
+                    dm.mDir.execute(sprintf(['INSERT INTO DetailLog (entryId, value, fieldId) ',...
                         'VALUES (%d, ''%s'', (SELECT id FROM DetailName WHERE fieldName = ''%s''))'],...
                         datasourceId,...
                         Details.(fieldName{i}),...
@@ -61,7 +61,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         end
         
         %Add missing Channels
-        ChannelName = mksqlite(dm.mDir, 'select id, channelName from ChannelName');
+        ChannelName = m.mDir.fetch('select id, channelName from ChannelName');
         if ~isempty(ChannelName)
             [~,indexMissing] = setxor(channels,ChannelName(:,2));
         else
@@ -88,10 +88,10 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
                 datasourceId,channels{i});
         end
         query = strjoin(query,'\n');
-        mksqlite(dm.mDir, query);
+        dm.mDir.execute(query);
         
         %Commit Changes to databse
-        mksqlite(dm.mDir, 'COMMIT');
+        dm.mDir.execute('COMMIT');
     catch e
         %If something goes wrong -> roll back changes
         mksqlite('ROLLBACK');
@@ -103,6 +103,6 @@ end
 
 function fastinsert(dbid, table, fieldnames, values)
     %Helper function for adding entries to the datastore
-    mksqlite(dbid, sprintf('INSERT INTO %s (%s) VALUES (''%s'')',...
+    dm.mDir.execute(sprintf('INSERT INTO %s (%s) VALUES (''%s'')',...
         table, strjoin(fieldnames,','), strjoin(values,''',''')));
 end

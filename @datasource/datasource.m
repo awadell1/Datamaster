@@ -31,7 +31,7 @@ classdef datasource < handle
             assert(length(ds) ==1, 'getDetails only supports singular datasources');
             
             %Load Details if missing
-            if isempty(ds.Details)
+            if isempty(ds.Detail)
                 %Fetch Details from datastore
                 DetailLog = mksqlite(ds.dm.mDir, sprintf(['SELECT DetailLog.entryId, '...
                     'DetailName.fieldName, DetailLog.value, DetailLog.unit FROM DetailLog ',...
@@ -49,7 +49,7 @@ classdef datasource < handle
                 end
             end
             
-            detail = ds.Detail.(Detail);
+            detail = ds.Detail;
         end
         
         function entry = getEntry(ds)
