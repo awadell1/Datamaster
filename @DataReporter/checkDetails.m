@@ -9,8 +9,8 @@ function checkDetails(dr,hash)
     %Check Each Datasource
     for i = 1:length(ds)
     	%%Report Current Log File
-    	fprintf('Logged Date: %s\n',datestr(ds(i).getDetails('Datetime')))
-    	fprintf('Origin Hash: %s\n',ds(i).Entry.OriginHash);
+    	fprintf('Logged Date: %s\n',ds(1).getEntry.Datetime)
+    	fprintf('Origin Hash: %s\n',ds(i).getEntry.OriginHash);
         
         %% Validate Event
         Error(i) = Error(i) + SelectionField(ds(i),'Event',...
@@ -22,11 +22,11 @@ function checkDetails(dr,hash)
 
 		%% Validate Engine ID -> Tune File name
 		%TODO: Find Tune Files
-		fprintf('\t%s: ''%s''\n','Engine ID',ds(i).getDetails('EngineID'));
+		fprintf('\t%s: ''%s''\n','Engine ID',ds(i).getDetail('EngineID'));
 
 		%% Validate Vehicle ID -> Vehicle Configuration Spreadsheet Filename
 		%TODO: Find/Set up Spreadsheet
-		fprintf('\t%s: ''%s''\n','Vehicle ID',ds(i).getDetails('VehicleID'));
+		fprintf('\t%s: ''%s''\n','Vehicle ID',ds(i).getDetail('VehicleID'));
 
 		%% Validate Driver -> Must be a NetID
 		Error(i) = Error(i)	+ RegExpTester(ds(i),'Driver','^(([a-z]{2,3}\d+)\s*)+$');
@@ -55,7 +55,7 @@ function valid = SelectionField(ds,Field,Allowed)
 	%Checks if field in Details was filled in with one of the allowed values
 	%If it wasn't report an error
 
-	fieldValue = ds.getDetails(Field);
+	fieldValue = ds.getDetail(Field);
 	regexpStr = ['^(' strjoin(Allowed,'|') ')$'];
 
 	if ~any(regexpi(fieldValue,regexpStr))
@@ -70,7 +70,7 @@ end
 function valid = RegExpTester(ds,Field,regexpStr)
 	%Uses the supplied RegExp to check if Field in the datasource's details was completed correctly
 
-	fieldValue = ds.getDetails(Field);
+	fieldValue = ds.getDetail(Field);
 
 	if ~any(regexpi(fieldValue,regexpStr))
 		fprintf('\tIllegal Entry: ''%s'' is not a valid entry for %s\n',fieldValue,Field)

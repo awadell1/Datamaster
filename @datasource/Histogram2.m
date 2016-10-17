@@ -40,8 +40,8 @@ function [count,h,ax] = Histogram2(ds,varargin)
     count = zeros(nBins(1),nBins(2));
     edgesX = linspace(Range(1,1),Range(1,2),nBins(1)+1);
     edgesY = linspace(Range(2,1),Range(2,2),nBins(2)+1);
-    
     duration = 0;
+    
     %Loop over each datasource
     nDatasource = length(ds);
     textprogressbar('Processing Datasources: ', 'new');

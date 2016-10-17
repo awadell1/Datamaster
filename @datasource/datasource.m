@@ -49,7 +49,12 @@ classdef datasource < handle
                 end
             end
             
-            detail = ds.Detail;
+            %Check if Detail exist
+            if isfield(ds.Detail, Detail)
+                detail = ds.Detail.Detail;  %Return Detail
+            else
+                detail = '';    %Detail is missing return empty
+            end
         end
         
         function entry = getEntry(ds)

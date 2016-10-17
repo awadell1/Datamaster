@@ -60,6 +60,9 @@ function stats = RefreshDatastore(dr)
         end
         
     end
+    
+    %Close i2 Pro
+    i2.Exit;
        
     %Report Duration
     fprintf('\n\nDatabase Refresh Complete\n');
@@ -82,3 +85,5 @@ function stats = RefreshDatastore(dr)
     
     %Get Git Version and report
     reportGitInfo;
+    
+    
