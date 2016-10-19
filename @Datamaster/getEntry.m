@@ -17,7 +17,7 @@ function [entry] = getEntry(dm,varargin)
         'WHERE masterDirectory.id IN (%s)'], strjoin(sprintfc('%d',index),',')));
     
     % Create Enteries from Logs
-    entry = repmat(struct('Index', [], 'OriginHash', [], 'FinalHash', [], 'Channel', [], 'Detail', [], 'Datetime', []),[length(MasterLog),1]);
+    entry = repmat(struct('Index', [], 'OriginHash', [], 'FinalHash', [], 'Channel', [], 'Detail', [], 'Datetime', []),[size(MasterLog,1),1]);
     
     %If no entries were found skip
     if ~isempty(entry)
