@@ -1,11 +1,8 @@
+function Report(hash)
 %% Summary Report for Recent Logging Events
 % This report was automatically generated using the following version of
 % the Datamaster project
-
-clear all
 dr = DataReporter;
-%%
-hash = {dr.dm.getEntry.OriginHash};
 
 %% Database Integrity Report
 % If you were involved with the creation of the following log files contact

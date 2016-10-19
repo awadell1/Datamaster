@@ -10,7 +10,6 @@ classdef DataReporter
     
     methods
         function dr = DataReporter()
-            
         end
         
         %% Function Signitures

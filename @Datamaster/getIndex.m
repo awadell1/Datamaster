@@ -20,7 +20,7 @@ function [index] = getIndex(dm, varargin)
         p = inputParser;
         p.FunctionName = 'getEntry';
         addRequired(p,'dm',@(x) isa(x,'Datamaster'));
-        addOptional(p,'Hash','',@(x) dm.validateHash(x) || true);
+        addOptional(p,'Hash','',@(x) dm.validateHash(x));
         
         %Add a Parameter for Each fieldname
         for i = 1:length(dm.Details)
@@ -31,8 +31,8 @@ function [index] = getIndex(dm, varargin)
         addParameter(p,'channel',   [],     @(x) ischar(x) || iscell(x));
         
         % Add a Parameter to a date range of intererst
-        addParameter(p,'StartDate', [],     @(x) true || validateDate(x));
-        addParameter(p,'EndDate',   [],     @(x) true || validateDate(x));
+        addParameter(p,'StartDate', [],     @(x) validateDatetime(x));
+        addParameter(p,'EndDate',   [],     @(x) validateDatetime(x));
         
         % Add Parameters to control how many results are returned
         addParameter(p,'Return',    [],         @isfloat);
@@ -56,7 +56,12 @@ function [index] = getIndex(dm, varargin)
         index = dm.mDir.fetch('SELECT id FROM masterDirectory');
     elseif ~strcmp(Hash,'')
         %Return Database enteries for that contain the supplied hash
-        hashStr = strjoin(Hash,''',''');
+        if iscellstr(Hash)
+            %Join hashes in to a list of hashes
+            hashStr = strjoin(Hash,''',''');
+        else %Hash is a string
+            hashStr = Hash;
+        end
         query = sprintf(['SELECT id FROM masterDirectory ',...
             'WHERE masterDirectory.FinalHash IN (''%s'') OR ',...
             'masterDirectory.OriginHash IN (''%s'')'],hashStr, hashStr);

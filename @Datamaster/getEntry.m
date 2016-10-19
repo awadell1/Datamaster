@@ -26,7 +26,7 @@ function [entry] = getEntry(dm,varargin)
         
         %Preallocate MasterLogIndex for locating entries
         MasterLogIndex = [MasterLog{:,1}];
-        for i = 1:length(MasterLog)
+        for i = 1:size(MasterLog, 1)
             %Add Channels to entry
             matchIndex = channelEntryId == index(i);    %Find Record in ChannelLog
             record = ChannelLog(matchIndex,2);    %Extract Channels from ChannelLog
