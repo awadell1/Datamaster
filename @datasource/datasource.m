@@ -109,8 +109,10 @@ classdef datasource < handle
                     newData = load(ds(i).MatPath,channelNames{isMissing});
                     
                     %Check that missing was loaded
-                    assert(isfield(newData, channelNames{isMissing}),...
-                        'Channel Not Logged')
+                    for j = 1:length(isMissing)
+                        assert(isfield(newData, channelNames{isMissing(j)}),...
+                            'Channel Not Logged');
+                    end
                     
                     %Append to Data
                     vars = fieldnames(newData);
