@@ -54,22 +54,11 @@ function timeNew = Sync(ds, varargin)
     
     %% Resample Channels as needed
     for i = 1:length(channels)
-        % Only resample if the channel's sampling period doesn't match the newSamplePeriod
-        if samplePeriod(i) ~= newSamplePeriod
-            % Linearly resample the channel
-            ds.Data.(channels{i}).Value = interp1(...
-                ds.Data.(channels{i}).Time,...
-                ds.Data.(channels{i}).Value,...
-                timeNew);
-            ds.Data.(channels{i}).Time = timeNew;
-        end
-        % Match the channel's time vector to the inclusive time vector
-        dropStart = find(ds.Data.(channels{i}).Time == timeNew(1), 1, 'first');
-        dropEnd = find(ds.Data.(channels{i}).Time == timeNew(end), 1, 'last');
-        
-        % Clip to the inclusive time vector
+        % Resample each channel
+        ds.Data.(channels{i}).Value = interp1(...
+            ds.Data.(channels{i}).Time,...
+            ds.Data.(channels{i}).Value,...
+            timeNew);
         ds.Data.(channels{i}).Time = timeNew;
-        ds.Data.(channels{i}).Value = ds.Data.(channels{i}).Value(dropStart:dropEnd);
-        
     end
     

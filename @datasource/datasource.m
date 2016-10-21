@@ -33,7 +33,7 @@ classdef datasource < handle
             %Load Details if missing
             if isempty(ds.Detail)
                 %Fetch Details from datastore
-                DetailLog = mksqlite(ds.dm.mDir, sprintf(['SELECT DetailLog.entryId, '...
+                DetailLog = ds.dm.mDir.sqlite(sprintf(['SELECT DetailLog.entryId, '...
                     'DetailName.fieldName, DetailLog.value, DetailLog.unit FROM DetailLog ',...
                     'INNER JOIN DetailName ON DetailName.id = DetailLog.fieldId ',...
                     'WHERE DetailLog.entryId IN (%s)'], strjoin(sprintfc('%d',ds.Entry.Index),',')));
@@ -92,7 +92,7 @@ classdef datasource < handle
     end
     
     methods (Access = public)
-        function loadChannels(ds,channelNames)
+        function loadChannel(ds,channelNames)
             
             %Force channel names into a cell array
             if ~iscell(channelNames)

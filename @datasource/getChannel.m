@@ -25,7 +25,7 @@ function channel = getChannel(ds,chanName,varargin)
         %Check if Channel has been loaded or filtering is set
         if ~isfield(ds.Data,chanName) || ~strcmp(filter,'none')
             ds.clearData(chanName);
-            ds.loadChannels(chanName);
+            ds.loadChannel(chanName);
         end
         
         %Apply Filtering

@@ -49,7 +49,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
         %Check if datasourc has logged Parameter
         if any(strcmp(chanNameX,ds(i).getLogged)) && any(strcmp(chanNameY,ds(i).getLogged))
             %Load Required Channels and sync sampling Rates
-            ds(i).loadChannels({chanNameX, chanNameY});
+            ds(i).loadChannel({chanNameX, chanNameY});
             ds(i).Sync;
             
             %Get Channels
