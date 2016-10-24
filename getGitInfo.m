@@ -90,7 +90,7 @@ gitInfo.branch=branchName;
 
 
 %Read in SHA1
-SHA1text=fileread(fullfile([repoPath '\' pathstr],[name ext]));
+SHA1text=fileread(fullfile(repoPath, pathstr,[name ext]));
 SHA1=textscan(SHA1text,'%s');
 gitInfo.hash=SHA1{1}{1};
 
