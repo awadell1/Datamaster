@@ -25,15 +25,7 @@ function [count,ax] = Histogram(ds,varargin)
     
     %Assert that some datasource match
     assert(~isempty(ds),'No Matching Datasources Found');
-    
-    %Set Unit
-    if isempty(p.Results.unit)
-        %Units unset by User -> Default to first Datasources's Units
-        unit = ds(1).getChannel(chanName, 'unit', ).Units;
-    else
-        unit = p.Results.unit;
-    end
-    
+       
     %Initialize arrays
     edges = linspace(Range(1),Range(2),nBins+1);
     
@@ -66,11 +58,15 @@ function [count,ax] = Histogram(ds,varargin)
     end
     
     %% Plot the histogram
+    figure
     xBarPoints = (edges(1:end-1) + edges(2:end))/2;
     bar(ax,xBarPoints,count,'histc');
     
     %Label Histogram
-    xlabel(sprintf('%s [%s]',chanName,unit),'interpreter','none')
+    xlabel(sprintf('%s [%s]',chanName, p.Results.unit),'interpreter','none')
     ylabel(p.Results.Normalization);
     title(sprintf('Based on %3.2f hrs of data',duration/3600));
+    
+    %Update axis
+    axis normal
 end

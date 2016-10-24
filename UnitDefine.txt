@@ -1,4 +1,4 @@
 # Definition of additonal units for use
 
 # G Force
-G = 9.80665 * N
+G = 9.80665 * [length] / [time] ** 2

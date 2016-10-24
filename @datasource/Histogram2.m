@@ -9,7 +9,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
         p.addRequired('chanNameX',              @(x) ischar(x));
         p.addRequired('chanNameY',              @(x) ischar(x));
         p.addRequired('Range',                  @(x) isfloat(x) && all(size(x)==[2,2]));
-        p.addParameter('unit',		   [],      @(x) iscell(x) && numel(x) == 2);
+        p.addParameter('unit',{'base', 'base'}, @(x) iscell(x) && numel(x) == 2);
         p.addParameter('nBins',		   [50,50],        @(x) isfloat(x) && length(x)==2);
         p.addParameter('Normalization',     'pdf',...
             @(x) any(strcmp(x,{'count','probability','pdf'})));
@@ -47,12 +47,12 @@ function [count,h,ax] = Histogram2(ds,varargin)
     %Define mapFun
     function [count, duration] = mapFun(ds)
         %Load Required Channels and sync sampling Rates
-        ds.loadChannels({chanNameX, chanNameY});
+        ds.loadChannel({chanNameX, chanNameY});
         ds.Sync;
         
         %Get Channels
-        channelX = ds.getChannel(chanNameX).Value;
-        channelY = ds.getChannel(chanNameY).Value;
+        channelX = ds.getChannel(chanNameX, 'unit', p.Results.unit{1}).Value;
+        channelY = ds.getChannel(chanNameY, 'unit', p.Results.unit{2}).Value;
         
         count = histcounts2(channelX,channelY,edgesX,edgesY);
         duration = range(ds.getChannel(chanNameX).Time);
