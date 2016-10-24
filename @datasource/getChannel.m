@@ -9,7 +9,11 @@ function channel = getChannel(ds,chanName,varargin)
         p.addRequired('chanName',@(x) ischar(x) || iscell(x));
         p.addOptional('filter', 'none', @(x) any(strcmp(x,{'none','hampel','median'})));
         p.addOptional('gate', 'off', @(x) any(strcmp(x,{'off', 'on'})));
+        p.addOptional('unit', 'base', @ischar);
     end
+
+    %Import python
+    import py.PyUnit.*
     
     %Extract Parameters
     parse(p,ds,chanName,varargin{:});
@@ -66,6 +70,12 @@ function channel = getChannel(ds,chanName,varargin)
                 ds.Data.(chanName).Value(dropIndex) = [];
                 ds.Data.(chanName).Time(dropIndex) = [];
         end
+
+        %% Convert Units
+        newValue = struct(convertUnit(ds.Data.(chanName).Value,...
+            ds.Data.(chanName).Units, p.Results.unit));
+        ds.Data.(chanName).Value = cell2mat(cell(newValue.value));
+        ds.Data.(chanName).Units = char(newValue.unit);
         
         %Return Channel
         channel = ds.Data.(chanName);
@@ -87,5 +97,20 @@ function valid = validateChannel(ds,channel)
         valid = any(strcmp(channel,ds.getLogged()));
     else
         valid = false;
+    end
+end
+function matData = py2Mat(pyData)
+%Function for converting python data types to matlab data types
+
+    switch true
+        case isa(pyData, 'py.str') || isa(pyData, 'py.unicode')
+            %Convert py.str to char
+            matData = char(pyData);
+        case isa(pyData, 'py.int')
+            %Convert py.int to double
+            matData = double(pyData);
+        otherwise
+            %Leave as is
+            matData = pyData;
     end
 end

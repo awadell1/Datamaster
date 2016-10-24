@@ -9,7 +9,7 @@ function [count,ax] = Histogram(ds,varargin)
         p.addRequired('chanName',               @(x) ischar(x));
         p.addRequired('Range',                  @(x) isfloat(x) && length(x)==2);
         p.addParameter('ax',         gca,       @(x) isa(x,matlab.graphics.axis.Axes));
-        p.addParameter('unit',		   [],        @ischar);
+        p.addParameter('unit',		 'base',    @ischar);
         p.addParameter('nBins',		   50,        @isfloat);
         p.addParameter('Normalization',     'pdf',...
             @(x) any(strcmp(x,{'count','probability','pdf'})));
@@ -29,7 +29,7 @@ function [count,ax] = Histogram(ds,varargin)
     %Set Unit
     if isempty(p.Results.unit)
         %Units unset by User -> Default to first Datasources's Units
-        unit = ds(1).getChannel(chanName).Units;
+        unit = ds(1).getChannel(chanName, 'unit', ).Units;
     else
         unit = p.Results.unit;
     end
@@ -42,7 +42,7 @@ function [count,ax] = Histogram(ds,varargin)
     
     %Define mapFun
     function [count, duration] = mapFun(ds)
-        count = histcounts(ds.getChannel(chanName).Value,edges);
+        count = histcounts(ds.getChannel(chanName, 'unit', p.Results.unit).Value,edges);
         duration = range(ds.getChannel(chanName).Time);
     end
     
