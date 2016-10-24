@@ -18,7 +18,7 @@ function ax = TimePlot(ds,varargin)
     ax = p.Results.ax;
     
     %Load required channels
-    ds.loadChannels(chanName);
+    ds.loadChannel(chanName);
     
     %Set Unit
     if strcmp(units,'')
