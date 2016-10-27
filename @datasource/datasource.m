@@ -120,6 +120,10 @@ classdef datasource < handle
                     vars = fieldnames(newData);
                     for j = 1:length(vars)
                         ds(i).Data.(vars{j}) = newData.(vars{j});
+                        
+                        %Replace ° with def
+                        ds(i).Data.(vars{j}).Units = ...
+                            strrep(newData.(vars{j}).Units, '°', 'deg');
                     end
                 end
             end

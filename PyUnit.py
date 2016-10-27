@@ -5,13 +5,13 @@ ureg = UnitRegistry(); #Load the Default Unit Definitions
 ureg.load_definitions('UnitDefine.txt') #Load additonal definitions
 
 def convertUnit(value, oldUnit, newUnit='base'):
-	#Convert to numpy array
-	value = numpy.array(value)
-
 	#Get Quanity Object
-	valueOld = value * ureg(oldUnit)
+	valueOld = UnitRegistry().Quantity(numpy.array(value), oldUnit)
 
-	if newUnit == 'base':
+	if oldUnit == '':
+		#Dimensionless -> Return
+		return {'value':value, 'unit':''}
+	elif newUnit == 'base':
 		#Convert to base unit
 		valueNew = valueOld.to_base_units()
 	else:

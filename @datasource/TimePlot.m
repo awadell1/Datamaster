@@ -31,8 +31,8 @@ function ax = TimePlot(ds,varargin)
     plot(ax, channel.Time,channel.Value);
     
     %Set the Legend Text
-    legendText = sprintf('%s @ %s on %s',ds.getDetails('Driver'),...
-        ds.getDetails('Venue'),datestr(ds.getDetails('Datetime')));
+    legendText = sprintf('%s @ %s on %s',ds.getDetail('Driver'),...
+        ds.getDetail('Venue'),datestr(ds.getDetail('Datetime')));
     
     %Get the current Legend
     leg = legend(ax);

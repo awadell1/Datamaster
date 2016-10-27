@@ -4,14 +4,14 @@ function channel = getChannel(ds,chanName,varargin)
     persistent p
     if ~isempty(p) || true
         p = inputParser;
-        p.FunctionName = 'Histogram2';
+        p.FunctionName = 'getChannel';
         p.addRequired('ds',@(x) isa(x,'datasource') && length(x)==1);
         p.addRequired('chanName',@(x) ischar(x) || iscell(x));
         p.addOptional('filter', 'none', @(x) any(strcmp(x,{'none','hampel','median'})));
-        p.addOptional('gate', 'off', @(x) any(strcmp(x,{'off', 'on'})));
-        p.addOptional('unit', 'base', @ischar);
+        p.addOptional('gate', 'off', @(x) any(strcmp(x,{'off', 'on', 'refresh'})));
+        p.addOptional('unit', '', @ischar);
     end
-
+    
     %Import python
     import py.PyUnit.*
     
@@ -26,13 +26,13 @@ function channel = getChannel(ds,chanName,varargin)
             channel.(chanName{i}) = ds.getChannel(chanName{i});
         end
     else
-        %Check if Channel has been loaded or filtering is set
+        %% Check if Channel has been loaded or filtering is set
         if ~isfield(ds.Data,chanName) || ~strcmp(filter,'none')
             ds.clearData(chanName);
             ds.loadChannel(chanName);
         end
         
-        %Apply Filtering
+        %% Apply Filtering
         if ~isempty(filter)
             switch filter
                 case 'hampel'
@@ -52,30 +52,30 @@ function channel = getChannel(ds,chanName,varargin)
                     ds.Data.(chanName).Value = medfilt1(ds.Data.(chanName).Value,n);
             end
         end
-
+        
         %% Apply Gating
-        switch p.Results.gate
-            case 'off'
-                %Do nothing
-            case 'on' || 'refresh'
-                %Refresh Gate if requested/required 
-                if strcmp(p.Results.gate, 'refresh') || isempty(ds.Gate.Value)
-                    ds. refreshGate;
-                end
-
-                %Find Samples to Drop
-                dropIndex = floor(interp1(ds.Gate.Time, 1* ds.Gate.Value, ds.Gate.(chanName).Time));
-
-                %Drop samples
-                ds.Data.(chanName).Value(dropIndex) = [];
-                ds.Data.(chanName).Time(dropIndex) = [];
+        if strcmp(p.Results.gate, 'on') || strcmp(p.Results.gate, 'refresh')
+            %Refresh Gate if requested/required
+            if strcmp(p.Results.gate, 'refresh') || isempty(ds.Gate.Value)
+                ds.clearData(chanName);
+                ds.refreshGate;
+            end
+            
+            %Find Samples to Drop
+            dropIndex = floor(interp1(ds.Gate.Time, 1* ds.Gate.Value, ds.Data.(chanName).Time));
+            
+            %Drop samples
+            ds.Data.(chanName).Value(~dropIndex) = [];
+            ds.Data.(chanName).Time(~dropIndex) = [];
         end
-
+        
         %% Convert Units
-        newValue = struct(convertUnit(ds.Data.(chanName).Value,...
-            ds.Data.(chanName).Units, p.Results.unit));
-        ds.Data.(chanName).Value = cell2mat(cell(newValue.value));
-        ds.Data.(chanName).Units = char(newValue.unit);
+        if ~strcmp(ds.Data.(chanName).Units, '') && ~strcmp(p.Results.unit,'')
+            newValue = struct(convertUnit(ds.Data.(chanName).Value,...
+                ds.Data.(chanName).Units, p.Results.unit));
+            ds.Data.(chanName).Value = cell2mat(cell(newValue.value));
+            ds.Data.(chanName).Units = char(newValue.unit);
+        end
         
         %Return Channel
         channel = ds.Data.(chanName);
@@ -97,20 +97,5 @@ function valid = validateChannel(ds,channel)
         valid = any(strcmp(channel,ds.getLogged()));
     else
         valid = false;
-    end
-end
-function matData = py2Mat(pyData)
-%Function for converting python data types to matlab data types
-
-    switch true
-        case isa(pyData, 'py.str') || isa(pyData, 'py.unicode')
-            %Convert py.str to char
-            matData = char(pyData);
-        case isa(pyData, 'py.int')
-            %Convert py.int to double
-            matData = double(pyData);
-        otherwise
-            %Leave as is
-            matData = pyData;
     end
 end

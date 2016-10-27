@@ -1,6 +1,7 @@
 Datastore/
 *.asv
 *.mat
+*.sqlite
 
 #Ignore folders
 html/**
@@ -16,3 +17,4 @@ config.ini
 #Ignore MoTeC Log Files
 *.ld
 *.ldx
+
