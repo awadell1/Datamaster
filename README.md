@@ -20,7 +20,7 @@ Ready to get started with Datamaster? Here's how:
     * Navigate to the Datamaster folder
     * Click Okay and approve the change
 6. Type the following command into MATLAB: `dm = Datamaster; ds = dm.getDatasource; ds(1:100).Histogram2('Engine_RPM', 'Manifold_Pres',[0, 10000; 70 170])`
-7. Congrats! You now have Datamaster up and running, now go check out the ~~wiki~~ and get started analyzing data
+7. Congrats! You now have Datamaster up and running, now go check out the [wiki](https://bitbucket.org/cornellracingsimulation/datamaster/wiki/Home) and get started analyzing data
 
 ## Don't know Git? Not a problem ##
 Git is a Distributed Version Control System, (Autodesk Vault is a Centralized Version Control System) created to handle source code for large open source projects. At it's basis Git strives to do the following:
