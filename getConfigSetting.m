@@ -3,48 +3,48 @@ function [value] = getConfigSetting(Section,Key)
     %   Detailed explanation goes here
 
     %Expected filename for config file
-    configFilename = 'config.ini';
+    userConfig = 'config.ini';
     defaultConfig = 'default.ini';
     
-    %Create a config object for reading the .ini file
-    persistent configSetting
-    if isempty(configSetting) || true
-        %Create an iniConfig object
-        configSetting = IniConfig();
-        
-        %Use the default config file unless config.ini exist
-        if exist(configFilename,'file')
-            configSetting.ReadFile(configFilename);
+    %% Create a persistent variable for accessing the default config file
+    persistent defaultSetting
+    if isempty(defaultSetting) || true
+        %Load the Default Configuration File
+        if  exist(defaultConfig,'file')
+            defaultSetting = IniConfig;
+            defaultSetting.ReadFile(defaultConfig);
         else
-            assert(exist(defaultConfig,'file')==2, 'Missing the Default Config File');
-            configSetting.ReadFile(defaultConfig);
+            % Missing Default config file -> Thow error so user goes and gets it
+            assert('Missing Default Settings File -> Obtain from Git Repo')
         end
+    end
+
+    %% Create a persistent variable for accessing the user config file
+    persistent userSetting
+    if isempty(userSetting) || true
+        %Load User Config file
+        if exist(userConfig,'file')
+            userSetting = IniConfig;
+            userSetting.ReadFile(userConfig);
+        else
+            userSetting = [];
+        end     
     end
     
-    %Check if the requested key exists
-    if ~configSetting.IsKeys(Section,Key)
-        %Request the key value from the user
-        prompt = sprintf('Missing Value for %s:%s\n Please enter it here:',Section,Key);
-        value = inputdlg(prompt,'Missing Configuration Setting');
+    %Check if the user has set the key
+    if userSetting.IsKeys(Section,Key)
+        %Return Key from user settings
+        value = userSetting.GetValues(Section,Key);
 
-        %Check if empty
-        if isempty(value)
-            errorStruct.message = sprintf('Missing Value for %s:%s',Section,Key);
-            errorStruct.identifier = 'Datamaster:ConfigSetting:MissingKey';
-            error(errorStruct);
-        else
-            %Extract from cell array
-            value = value{:};
+    %Check for a default setting
+    elseif defaultSetting.IsKeys(Section,Key)
+        %Return key from default settings
+        value = defaultSetting.GetValues(Section,Key);
 
-            %Add the Key 
-            configSetting.AddKeys(Section,Key,value);
-            configSetting.WriteFile(configFilename);
-        end
-    else
-        %Get the Requested value
-        value = configSetting.GetValues(Section,Key);
-    end
-
-   
+    else % Abort and notify User
+        errorStruct.message = sprintf('Missing Value for %s:%s',Section,Key);
+        errorStruct.identifier = 'Datamaster:ConfigSetting:MissingKey';
+        error(errorStruct);
+    end  
 end
 

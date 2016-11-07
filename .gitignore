@@ -9,7 +9,8 @@ __pycache__/**
 Dependencies/**
 
 #Ignore Config Files
-config.ini
+*.ini
+!default.ini
 
 #Ignore zip folders
 *.zip
