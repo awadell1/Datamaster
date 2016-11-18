@@ -4,7 +4,7 @@ classdef Datamaster < handle
     % providing access to the datasource en mass
     
     properties (Access = private)
-        mDir = connectSQLite;       %Connection Handle to the SQL Database
+        mDir = [];       %Connection Handle to the SQL Database
         Datastore = nan             %Location of the Datastore
         
         Details = [];               %Stores a list of Details and their keys
@@ -22,11 +22,36 @@ classdef Datamaster < handle
             %Report Current Version info
             reportGitInfo;
             
-            %Get a list of Details and Channels that have been logged
-            dm.updateDetails; dm.updateChannels;
-            
             %Set Relavant Locations
             dm.Datastore = getConfigSetting('Datastore','datastore_path');
+            
+            %% Check Datastore for Updates
+            
+            %Hash Remote Datastore
+            mDirRemote = getConfigSetting('Datastore','master_directory_path');
+            serverHash = DataHash(mDirRemote, dm.HashOptions);
+            
+            %Check if Local Copy Exist
+            mDirLocal = getConfigSetting('Datastore','master_directory_path_local');
+            if exist(mDirLocal,'file')
+                %Hash Local Copy
+                localHash = DataHash(mDirLocal, dm.HashOptions);
+            else
+                localHash = '';
+            end
+            
+            %If Hashes don't match -> Copy Server
+            if ~strcmp(serverHash, localHash)
+                copyfile(mDirRemote, mDirLocal)
+            end
+            
+            %% Load Database
+            dm.mDir = connectSQLite(mDirLocal);
+            
+            % Get a list of Details and Channels that have been logged
+            dm.updateDetails; dm.updateChannels;
+            
+            
         end
         
         %% Small Public Methods -> Move externally if it grows
@@ -51,7 +76,7 @@ classdef Datamaster < handle
             %database
             dm.Channels = dm.mDir.fetch('SELECT ChannelName.channelname, ChannelName.id FROM ChannelName');
         end
-            
+        
     end
     
     %% Function Signitures for Public Methods
@@ -65,7 +90,7 @@ classdef Datamaster < handle
         Datasource = getDatasource(dm,varargin)
         
         [Entry] = getEntry(dm,varargin)
-
+        
         [index] = getIndex(dm, varargin)
         
         removeEntry(obj,varagin)

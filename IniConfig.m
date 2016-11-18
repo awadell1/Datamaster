@@ -98,7 +98,7 @@ classdef IniConfig < handle
     
     
     properties (GetAccess = 'public', SetAccess = 'private')
-        comment_style = '%' % style of comments
+        comment_style = '#' % style of comments
         count_sections = 0  % number of sections
         count_all_keys = 0  % number of all keys
     end

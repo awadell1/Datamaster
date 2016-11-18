@@ -96,16 +96,7 @@ function [index] = getIndex(dm, varargin)
         end
         
         
-        %% Search by Datetime
-        
-        % Convert to datetime if needed
-        %         if ischar(StartDate)
-        %             StartDate = datetime(StartDate,'format','MM/dd/uu');
-        %         end
-        %         if ischar(EndDate)
-        %             EndDate = datetime(EndDate,'format','MM/dd/uu');
-        %         end
-        
+        %% Search by Datetime      
         if ~isempty(StartDate) && ~isempty(EndDate)
             fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM masterDirectory ',...
                 'WHERE Datetime BETWEEN ''%s'' AND ''%s'''], StartDate, EndDate);

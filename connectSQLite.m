@@ -1,8 +1,5 @@
-function [SQLite_Database] = connectSQLite()
+function [SQLite_Database] = connectSQLite(dbpath)
     %connectSQLite connects to an SQLite Database and returns a database connection
-    
-    %Settings for SQLite Connection
-    dbpath = getConfigSetting('Datastore','master_directory_path');
     
     %Check if python is installed
     if isempty(pyversion)
