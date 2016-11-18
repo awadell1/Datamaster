@@ -71,6 +71,9 @@ function channel = getChannel(ds,chanName,varargin)
         
         %% Convert Units
         if ~strcmp(ds.Data.(chanName).Units, '') && ~strcmp(p.Results.unit,'')
+            %Remove Middle dot
+            ds.Data.(chanName).Units = strrep(ds.Data.(chanName).Units, '·', '*');
+            
             newValue = struct(convertUnit(ds.Data.(chanName).Value,...
                 ds.Data.(chanName).Units, p.Results.unit));
             ds.Data.(chanName).Value = cell2mat(cell(newValue.value));

@@ -59,6 +59,7 @@ function [count,ax] = Histogram(ds,varargin)
     
     %% Plot the histogram
     figure
+    hold on
     xBarPoints = (edges(1:end-1) + edges(2:end))/2;
     bar(ax,xBarPoints,count,'histc');
     
@@ -69,4 +70,5 @@ function [count,ax] = Histogram(ds,varargin)
     
     %Update axis
     axis normal
+    hold off
 end
