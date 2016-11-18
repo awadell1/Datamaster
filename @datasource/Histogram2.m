@@ -11,7 +11,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
         p.addRequired('Range',                  @(x) isfloat(x) && all(size(x)==[2,2]));
         p.addParameter('unit',{'base', 'base'}, @(x) iscell(x) && numel(x) == 2);
         p.addParameter('nBins',		   [50,50],        @(x) isfloat(x) && length(x)==2);
-        p.addParameter('Normalization',     'pdf',...
+        p.addParameter('normalization',     'pdf',...
             @(x) any(strcmp(x,{'count','probability','pdf'})));
     end
     

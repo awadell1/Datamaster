@@ -32,12 +32,12 @@ function [value] = getConfigSetting(Section,Key)
     end
     
     %Check if the user has set the key
-    if userSetting.IsKeys(Section,Key)
+    if isa(userSetting, 'IniConfig') && userSetting.IsKeys(Section,Key)
         %Return Key from user settings
         value = userSetting.GetValues(Section,Key);
 
     %Check for a default setting
-    elseif defaultSetting.IsKeys(Section,Key)
+    elseif isa(defaultSetting, 'IniConfig') && defaultSetting.IsKeys(Section,Key)
         %Return key from default settings
         value = defaultSetting.GetValues(Section,Key);
 
