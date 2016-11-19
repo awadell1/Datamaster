@@ -65,7 +65,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
     end
     
     %% Normalize Counts
-    switch p.Results.Normalization
+    switch p.Results.normalization
         case 'pdf'
             %Compute Area of each bin
             cellArea = range(Range(1,:))*range(Range(2,:));
