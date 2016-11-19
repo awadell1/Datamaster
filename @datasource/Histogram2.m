@@ -100,7 +100,7 @@ function [count,h,ax] = Histogram2(ds,varargin)
     
     %Add and label the colorbar
     cBar = colorbar; colormap(jet);
-    ylabel(cBar,cBarLabel);
+    ylabel(cBar,cBarLabel, 'FontSize', 12);
     
     %Set the coloraxis to something reasonable
     m = mean(count(~isinf(count))); s = std(count(~isinf(count)));

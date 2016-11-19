@@ -35,8 +35,7 @@ function [index] = getIndex(dm, varargin)
         addParameter(p,'EndDate',   [],     @(x) validateDatetime(x));
         
         % Add Parameters to control how many results are returned
-        addParameter(p,'Return',    [],         @isfloat);
-        addParameter(p,'Sort',      [],         @ischar);
+        addParameter(p,'limit',    [],         @(x) isnumeric(x) && (x == round(x)));
     end
     
     %Parse Inputs and expand to vectors
@@ -116,6 +115,12 @@ function [index] = getIndex(dm, varargin)
                 'WHERE ChannelName.channelName IN (''%s'') ',...
                 'GROUP BY masterDirectory.id HAVING count(*) = %d'],...
                 strjoin(channel, ''', '''),length(channel));
+        end
+
+      
+        %% Set Limit
+        if ~isempty(p.Results.limit)
+            fullQuery{end+1} = sprintf('SELECT masterDirectory.id FROM masterDirectory LIMIT %d', p.Results.limit);
         end
         
         %Combine Queries and get the list of Datasource that meet search criteria

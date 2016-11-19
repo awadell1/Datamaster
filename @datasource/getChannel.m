@@ -9,7 +9,7 @@ if ~isempty(p) || true
     p.addRequired('chanName',@(x) ischar(x) || iscell(x));
     p.addOptional('filter', 'none', @(x) any(strcmp(x,{'none','hampel','median'})));
     p.addOptional('gate', 'off', @(x) any(strcmp(x,{'off', 'on', 'refresh'})));
-    p.addOptional('unit', '', @ischar);
+    p.addOptional('unit', 'base', @ischar);
 end
 
 %Extract Parameters
