@@ -19,3 +19,4 @@ Dependencies/**
 *.ld
 *.ldx
 
+*.sublime-*

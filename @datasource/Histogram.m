@@ -8,7 +8,6 @@ function [count,ax] = Histogram(ds,varargin)
         p.addRequired('ds',                     @(x) isa(x,'datasource'));
         p.addRequired('chanName',               @(x) ischar(x));
         p.addRequired('Range',                  @(x) isfloat(x) && length(x)==2);
-        p.addParameter('ax',         gca,       @(x) isa(x,matlab.graphics.axis.Axes));
         p.addParameter('unit',		 'base',    @ischar);
         p.addParameter('nBins',		   50,        @isfloat);
         p.addParameter('Normalization',     'pdf',...
@@ -21,8 +20,7 @@ function [count,ax] = Histogram(ds,varargin)
     chanName = p.Results.chanName;
     nBins = p.Results.nBins;
     Range = p.Results.Range;
-    ax = p.Results.ax;
-    
+   
     %Assert that some datasource match
     assert(~isempty(ds),'No Matching Datasources Found');
        
@@ -58,8 +56,8 @@ function [count,ax] = Histogram(ds,varargin)
     end
     
     %% Plot the histogram
-    figure
-    hold on
+    ax = gca;
+    hold on; box on
     xBarPoints = (edges(1:end-1) + edges(2:end))/2;
     bar(ax,xBarPoints,count,'histc');
     
