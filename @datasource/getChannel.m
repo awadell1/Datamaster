@@ -67,7 +67,7 @@ else
     end
     
     %% Convert Units
-    if ~strcmp(ds.Data.(chanName).Units, '') && ~strcmp(p.Results.unit,'')
+    if ~strcmp(p.Results.unit,'')
         %Convert Unit
         [value, unit] = convertUnit(ds.Data.(chanName).Value,...
             ds.Data.(chanName).Units,...

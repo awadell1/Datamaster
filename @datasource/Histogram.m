@@ -32,8 +32,9 @@ function [count,ax] = Histogram(ds,varargin)
     
     %Define mapFun
     function [count, duration] = mapFun(ds)
-        count = histcounts(ds.getChannel(chanName, 'unit', p.Results.unit).Value,edges);
-        duration = range(ds.getChannel(chanName).Time);
+        channel = ds.getChannel(chanName, 'unit', p.Results.unit);
+        count = histcounts(channel.Value,edges);
+        duration = range(channel.Time);
     end
     
     %Define Reduce Function

@@ -2,3 +2,6 @@
 
 # G Force
 G = gravity
+
+#Lambda Ratio
+LA = []
