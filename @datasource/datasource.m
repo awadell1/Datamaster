@@ -93,6 +93,8 @@ classdef datasource < handle
         setGate(ds, filterHandle)
         
         varargout = mapReduce(ds, mapFun, reduceFun, varargin)
+        
+        [cdf_2, x, y, duration] = CDF2(ds,varargin)
     end
     
     methods (Access = public)

@@ -90,16 +90,14 @@ function [count,h,ax] = Histogram2(ds,varargin)
     count = log10(count);
     
     %Plot the histogram and turn of countour lines
-    figure
     xBarPoints = (edgesX(1:end-1) + edgesX(2:end))/2;
     yBarPoints = (edgesY(1:end-1) + edgesY(2:end))/2;
     [~,h] = contourf(xBarPoints,yBarPoints,count'); %Transpose as countourf and histocounts define x differently
     h.LineStyle = 'none';
     box on
-    grid on
     
     %Add and label the colorbar
-    cBar = colorbar; colormap(jet);
+    cBar = colorbar; Datamaster.colormap('warm');
     ylabel(cBar,cBarLabel, 'FontSize', 12);
     
     %Set the coloraxis to something reasonable

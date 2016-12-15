@@ -104,5 +104,9 @@ classdef Datamaster < handle
         LoggedParameters = allLogged(dm,varargin)
     end
     
+    methods (Access = public, Static = true)
+       colormap(name) 
+    end
+    
 end
 
