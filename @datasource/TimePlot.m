@@ -23,18 +23,7 @@ function ax = TimePlot(ds,varargin)
     %Plot the Channel
     channel = ds.getChannel(chanName, 'unit', unit);
     plot(ax, channel.Time,channel.Value);
-    
-    %Set the Legend Text
-    legendText = sprintf('%s @ %s on %s',ds.getDetail('Driver'),...
-        ds.getDetail('Venue'),datestr(ds.getDetail('Datetime')));
-    
-    %Get the current Legend
-    leg = legend(ax);
-    legendText = [leg.String legendText];
-    
-    %Append New Legend Entry to Legend
-    legend(ax,legendText);
-    
+        
     %Anotate Plot
     xlabel('Time [s]')
     ylabel(sprintf('[%s]',unit));
