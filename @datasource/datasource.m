@@ -2,6 +2,7 @@ classdef datasource < handle
     %Class for structing MoTeC Log Data and supporting documentation
     
     properties (Access = private)
+        Index = [];             %Location of Entry in datastore
         Data = struct;          %Structure of Logged Data
         Entry = struct;         %Structure of masterDirectory
         Channel = {};           %Cell Array of logged channels
@@ -15,6 +16,7 @@ classdef datasource < handle
         function obj = datasource(dm,Entry)
             obj.dm = dm;
             obj.Entry = Entry;
+            obj.Index = Entry.Index;
             
             obj.MatPath = fullfile(dm.getDatastore,[Entry.FinalHash '.mat']);
         end
@@ -89,6 +91,10 @@ classdef datasource < handle
         newTime = Sync(varargin)
         
         setGate(ds, filterHandle)
+        
+        varargout = mapReduce(ds, mapFun, reduceFun, varargin)
+        
+        [cdf_2, x, y, duration] = CDF2(ds,varargin)
     end
     
     methods (Access = public)
@@ -116,6 +122,10 @@ classdef datasource < handle
                     vars = fieldnames(newData);
                     for j = 1:length(vars)
                         ds(i).Data.(vars{j}) = newData.(vars{j});
+                        
+                        %Replace ° with def
+                        ds(i).Data.(vars{j}).Units = ...
+                            strrep(newData.(vars{j}).Units, '°', 'deg');
                     end
                 end
             end

@@ -1,0 +1,7 @@
+# Definition of additonal units for use
+
+# G Force
+G = gravity
+
+#Lambda Ratio
+LA = []

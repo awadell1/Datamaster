@@ -8,8 +8,7 @@ function [count,ax] = Histogram(ds,varargin)
         p.addRequired('ds',                     @(x) isa(x,'datasource'));
         p.addRequired('chanName',               @(x) ischar(x));
         p.addRequired('Range',                  @(x) isfloat(x) && length(x)==2);
-        p.addParameter('ax',         gca,       @(x) isa(x,matlab.graphics.axis.Axes));
-        p.addParameter('unit',		   [],        @ischar);
+        p.addParameter('unit',		 'base',    @ischar);
         p.addParameter('nBins',		   50,        @isfloat);
         p.addParameter('Normalization',     'pdf',...
             @(x) any(strcmp(x,{'count','probability','pdf'})));
@@ -21,45 +20,30 @@ function [count,ax] = Histogram(ds,varargin)
     chanName = p.Results.chanName;
     nBins = p.Results.nBins;
     Range = p.Results.Range;
-    ax = p.Results.ax;
-
+   
     %Assert that some datasource match
     assert(~isempty(ds),'No Matching Datasources Found');
-    
-    %Set the Unit
-    %Set Unit
-    if isempty(p.Results.unit)
-        %Units unset by User -> Default to first Datasources's Units
-        unit = ds(1).getChannel(chanName).Units;
-    else
-        unit = p.Results.unit;
-    end
-    
+       
     %Initialize arrays
-    count = zeros(1,nBins);
     edges = linspace(Range(1),Range(2),nBins+1);
-    duration = 0;
     
-    %Loop over each datasource
-    nDatasource = length(ds);
-    textprogressbar('Processing Datasources: ', 'new');
-    for i = 1:nDatasource
-        %Check if datasourc has logged Parameter
-        if any(strcmp(chanName,ds(i).getLogged))
-            %Bin logged data for each datasource
-            count = histcounts(ds(i).getChannel(chanName).Value,edges) + count;
-            duration = range(ds(i).getChannel(chanName).Time) + duration;
-            
-            %Clear data to preserve RAM
-            ds(i).clearData;
-        end
-        
-        %Update progress bar
-        textprogressbar(100*i/nDatasource);
+    %% Process Datasource
+    [count,duration] = mapReduce(ds, @mapFun, @reduceFun, chanName);
+    
+    %Define mapFun
+    function [count, duration] = mapFun(ds)
+        channel = ds.getChannel(chanName, 'unit', p.Results.unit);
+        count = histcounts(channel.Value,edges);
+        duration = range(channel.Time);
     end
-    textprogressbar('done');
     
-    %Normalize Counts
+    %Define Reduce Function
+    function [count, duration] = reduceFun(count, duration)
+       count = sum(cell2mat(count));
+       duration = sum([duration{:}]);
+    end
+    
+    %% Normalize Counts
     switch p.Results.Normalization
         case 'pdf'
             count = count ./ (sum(count) * (range(Range)/nBins));
@@ -71,11 +55,19 @@ function [count,ax] = Histogram(ds,varargin)
             %Do Nothing
             ylabel('Count');
     end
-    %Plot the histogram
+    
+    %% Plot the histogram
+    ax = gca;
+    hold on; box on
     xBarPoints = (edges(1:end-1) + edges(2:end))/2;
     bar(ax,xBarPoints,count,'histc');
     
     %Label Histogram
-    xlabel(sprintf('%s [%s]',chanName,unit),'interpreter','none')
+    xlabel(sprintf('%s [%s]',chanName, p.Results.unit),'interpreter','none')
     ylabel(p.Results.Normalization);
     title(sprintf('Based on %3.2f hrs of data',duration/3600));
+    
+    %Update axis
+    axis normal
+    hold off
+end

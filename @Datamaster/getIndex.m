@@ -35,8 +35,7 @@ function [index] = getIndex(dm, varargin)
         addParameter(p,'EndDate',   [],     @(x) validateDatetime(x));
         
         % Add Parameters to control how many results are returned
-        addParameter(p,'Return',    [],         @isfloat);
-        addParameter(p,'Sort',      [],         @ischar);
+        addParameter(p,'limit',    [],         @(x) isnumeric(x) && (x == round(x)));
     end
     
     %Parse Inputs and expand to vectors
@@ -96,16 +95,7 @@ function [index] = getIndex(dm, varargin)
         end
         
         
-        %% Search by Datetime
-        
-        % Convert to datetime if needed
-        %         if ischar(StartDate)
-        %             StartDate = datetime(StartDate,'format','MM/dd/uu');
-        %         end
-        %         if ischar(EndDate)
-        %             EndDate = datetime(EndDate,'format','MM/dd/uu');
-        %         end
-        
+        %% Search by Datetime      
         if ~isempty(StartDate) && ~isempty(EndDate)
             fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM masterDirectory ',...
                 'WHERE Datetime BETWEEN ''%s'' AND ''%s'''], StartDate, EndDate);
@@ -124,7 +114,13 @@ function [index] = getIndex(dm, varargin)
                 'INNER JOIN masterDirectory ON masterDirectory.id = ChannelLog.entryId ',...
                 'WHERE ChannelName.channelName IN (''%s'') ',...
                 'GROUP BY masterDirectory.id HAVING count(*) = %d'],...
-                strjoin(channel, ''','''),length(channel));
+                strjoin(channel, ''', '''),length(channel));
+        end
+
+      
+        %% Set Limit
+        if ~isempty(p.Results.limit)
+            fullQuery{end+1} = sprintf('SELECT masterDirectory.id FROM masterDirectory LIMIT %d', p.Results.limit);
         end
         
         %Combine Queries and get the list of Datasource that meet search criteria

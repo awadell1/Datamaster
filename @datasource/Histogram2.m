@@ -9,9 +9,9 @@ function [count,h,ax] = Histogram2(ds,varargin)
         p.addRequired('chanNameX',              @(x) ischar(x));
         p.addRequired('chanNameY',              @(x) ischar(x));
         p.addRequired('Range',                  @(x) isfloat(x) && all(size(x)==[2,2]));
-        p.addParameter('unit',		   [],      @(x) iscell(x) && numel(x) == 2);
+        p.addParameter('unit',{'base', 'base'}, @(x) iscell(x) && numel(x) == 2);
         p.addParameter('nBins',		   [50,50],        @(x) isfloat(x) && length(x)==2);
-        p.addParameter('Normalization',     'pdf',...
+        p.addParameter('normalization',     'pdf',...
             @(x) any(strcmp(x,{'count','probability','pdf'})));
     end
     
@@ -37,39 +37,35 @@ function [count,h,ax] = Histogram2(ds,varargin)
     end
     
     %Initialize arrays
-    count = zeros(nBins(1),nBins(2));
     edgesX = linspace(Range(1,1),Range(1,2),nBins(1)+1);
     edgesY = linspace(Range(2,1),Range(2,2),nBins(2)+1);
-    duration = 0;
     
-    %Loop over each datasource
-    nDatasource = length(ds);
-    textprogressbar('Processing Datasources: ', 'new');
-    for i = 1:nDatasource
-        %Check if datasourc has logged Parameter
-        if any(strcmp(chanNameX,ds(i).getLogged)) && any(strcmp(chanNameY,ds(i).getLogged))
-            %Load Required Channels and sync sampling Rates
-            ds(i).loadChannel({chanNameX, chanNameY});
-            ds(i).Sync;
-            
-            %Get Channels
-            channelX = ds(i).getChannel(chanNameX).Value;
-            channelY = ds(i).getChannel(chanNameY).Value;
-            
-            %Bin logged data for each datasource
-            count = histcounts2(channelX,channelY,edgesX,edgesY) + count;
-            
-            %Clear data to preserve RAM
-            ds(i).clearData;
-        end
+    %% Process Datasource
+    [count,duration] = mapReduce(ds, @mapFun,...
+        @reduceFun, {chanNameX, chanNameY});
+    
+    %Define mapFun
+    function [count, duration] = mapFun(ds)
+        %Load Required Channels and sync sampling Rates
+        ds.loadChannel({chanNameX, chanNameY});
+        ds.Sync;
         
-        %Update progress bar
-        textprogressbar(100*i/nDatasource);
+        %Get Channels
+        channelX = ds.getChannel(chanNameX, 'unit', p.Results.unit{1}).Value;
+        channelY = ds.getChannel(chanNameY, 'unit', p.Results.unit{2}).Value;
+        
+        count = histcounts2(channelX,channelY,edgesX,edgesY);
+        duration = range(ds.getChannel(chanNameX).Time);
     end
-    textprogressbar('done');
     
-    %Normalize Counts
-    switch p.Results.Normalization
+    %Define Reduce Function
+    function [count, duration] = reduceFun(count, duration)
+        count = sum(cat(3,count{:}),3);
+        duration = sum([duration{:}]);
+    end
+    
+    %% Normalize Counts
+    switch p.Results.normalization
         case 'pdf'
             %Compute Area of each bin
             cellArea = range(Range(1,:))*range(Range(2,:));
@@ -94,17 +90,15 @@ function [count,h,ax] = Histogram2(ds,varargin)
     count = log10(count);
     
     %Plot the histogram and turn of countour lines
-    figure
     xBarPoints = (edgesX(1:end-1) + edgesX(2:end))/2;
     yBarPoints = (edgesY(1:end-1) + edgesY(2:end))/2;
     [~,h] = contourf(xBarPoints,yBarPoints,count'); %Transpose as countourf and histocounts define x differently
     h.LineStyle = 'none';
     box on
-    grid on
     
     %Add and label the colorbar
-    cBar = colorbar; colormap(jet);
-    ylabel(cBar,cBarLabel);
+    cBar = colorbar; Datamaster.colormap('warm');
+    ylabel(cBar,cBarLabel, 'FontSize', 12);
     
     %Set the coloraxis to something reasonable
     m = mean(count(~isinf(count))); s = std(count(~isinf(count)));
@@ -114,3 +108,4 @@ function [count,h,ax] = Histogram2(ds,varargin)
     xlabel(sprintf('%s [%s]',chanNameX,unit{1}),'interpreter','none')
     ylabel(sprintf('%s [%s]',chanNameY,unit{2}),'interpreter','none')
     title(sprintf('Based on %3.2f hrs of data',duration/3600));
+end

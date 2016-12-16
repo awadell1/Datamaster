@@ -8,39 +8,22 @@ function ax = TimePlot(ds,varargin)
         p.addRequired('ds',@(x) isa(x,'datasource')); %ds must be a single datasource
         p.addOptional('ax',gca, @(x) isa(x,matlab.graphics.axis.Axes));
         p.addRequired('chanName',@(x) ischar(x));
-        p.addParameter('units','',@ischar);
+        p.addParameter('unit',		 'base',    @ischar);
     end
     
     parse(p,ds,varargin{:});
     ds = p.Results.ds;
     chanName = p.Results.chanName;
-    units = p.Results.units;
+    unit = p.Results.unit;
     ax = p.Results.ax;
     
     %Load required channels
-    ds.loadChannels(chanName);
-    
-    %Set Unit
-    if strcmp(units,'')
-        %Units unset by User -> Default to first Datasources's Units
-        units = ds.getChannel(chanName).Units;
-    end
+    ds.loadChannel(chanName);
     
     %Plot the Channel
-    channel = ds.getChannel(chanName);
+    channel = ds.getChannel(chanName, 'unit', unit);
     plot(ax, channel.Time,channel.Value);
-    
-    %Set the Legend Text
-    legendText = sprintf('%s @ %s on %s',ds.getDetails('Driver'),...
-        ds.getDetails('Venue'),datestr(ds.getDetails('Datetime')));
-    
-    %Get the current Legend
-    leg = legend(ax);
-    legendText = [leg.String legendText];
-    
-    %Append New Legend Entry to Legend
-    legend(ax,legendText);
-    
+        
     %Anotate Plot
     xlabel('Time [s]')
-    ylabel(sprintf('[%s]',units));
+    ylabel(sprintf('[%s]',unit));
