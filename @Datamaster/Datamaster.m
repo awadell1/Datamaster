@@ -22,36 +22,15 @@ classdef Datamaster < handle
             %Report Current Version info
             reportGitInfo;
             
-            %Set Relavant Locations
+            % Set Datastore Path
             dm.Datastore = getConfigSetting('Datastore','datastore_path');
             
-            %% Check Datastore for Updates
-            
-            %Hash Remote Datastore
-            mDirRemote = getConfigSetting('Datastore','master_directory_path');
-            serverHash = DataHash(mDirRemote, dm.HashOptions);
-            
-            %Check if Local Copy Exist
-            mDirLocal = getConfigSetting('Datastore','master_directory_path_local');
-            if exist(mDirLocal,'file')
-                %Hash Local Copy
-                localHash = DataHash(mDirLocal, dm.HashOptions);
-            else
-                localHash = '';
-            end
-            
-            %If Hashes don't match -> Copy Server
-            if ~strcmp(serverHash, localHash)
-                copyfile(mDirRemote, mDirLocal)
-            end
-            
-            %% Load Database
-            dm.mDir = connectSQLite(mDirLocal);
+            % Load Database
+            mDirPath = getConfigSetting('Datastore','master_directory_path');
+            dm.mDir = connectSQLite(mDirPath);
             
             % Get a list of Details and Channels that have been logged
             dm.updateDetails; dm.updateChannels;
-            
-            
         end
         
         %% Small Public Methods -> Move externally if it grows
@@ -105,7 +84,17 @@ classdef Datamaster < handle
     end
     
     methods (Access = public, Static = true)
-       colormap(name) 
+        
+        function DatamasterPath = getPath
+        %Function that returns the path to the Datamaster folder
+            DatamasterPath = regexpi(which('Datamaster'),...
+                '(.*)\\@Datamaster\\Datamaster.m', 'tokens');
+            DatamasterPath = DatamasterPath{:}{:};
+        end
+        
+        
+        colormap(name)
+        
     end
     
 end

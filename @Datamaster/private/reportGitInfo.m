@@ -1,6 +1,6 @@
 function reportGitInfo()
     %Report Current Version info
-    gitInfo = getGitInfo(fileparts(which('reportGitInfo')));
+    gitInfo = getGitInfo(Datamaster.getPath);
     if ~isempty(gitInfo)
     	fprintf('Version: %s - %s\n',gitInfo.branch, gitInfo.hash);
     	fprintf('Host: %s\n',gitInfo.url);
