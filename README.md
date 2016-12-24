@@ -7,6 +7,14 @@ Datamaster is a set of MATLAB objects that enable multi-MoTeC Log file analysis,
 * Leverage the power of MATLAB for advanced signal filtering, plotting and more
 * Baked in analysis tools for analyzing car performance (ie. gg-circles, torque curves, etc)
 
+## Getting Started with Datamaster ##
+Assuming MATLAB is already installed, download and run this setup GUI: [here](https://github.com/awadell1/Datamaster/raw/master/DatmasterPreference.mlapp)
+
+If you have not already installed MATLAB, do that now.
+
+## For Mac and Linux Users ##
+Datamaster is built using cross-platform tools (MATLAB and Phython) and has been tested using Linux. However, at present Datamaster is developed solely on a PC and thus other platforms, while not unsupported are largely untested. If you do run into any bug/ missing feature for your platform, please submit a bug/feature request. However given my personal lack of access to non PC platforms, any less than obvious fixes may take time.
+
 ## Bug Reporting ##
 Datamaster is still very much in it's infancy, and as such bugs are to be expected. If you do by chance happen to find a bug:
 
