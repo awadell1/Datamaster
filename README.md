@@ -1,5 +1,3 @@
-# Datamaster#
-
 ## What is Datamaster ##
 Datamaster is a set of MATLAB objects that enable multi-MoTeC Log file analysis, devloped for Cornell Racing to enable designers to validate load cases or quantify system by quickly analyzing thousands of log files.
 
