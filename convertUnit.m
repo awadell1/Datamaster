@@ -22,8 +22,11 @@ oldUnit = p.Results.oldUnit;
 newUnit = p.Results.newUnit;
 
 %If dimensionless -> Return
-if strcmp(oldUnit, '') || strcmp(oldUnit, newUnit)
+if strcmp(oldUnit, '')
     return
+    
+elseif strcmp(oldUnit, newUnit)
+    unit = oldUnit;
 else
     %Remove Unicode Charaters from oldUnit
     oldUnit = strrep(oldUnit, '°', 'deg');  %Remove Degree symbol
