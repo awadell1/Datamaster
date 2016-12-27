@@ -22,7 +22,7 @@ oldUnit = p.Results.oldUnit;
 newUnit = p.Results.newUnit;
 
 %If dimensionless -> Return
-if strcmp(oldUnit, '')
+if strcmp(oldUnit, '') || strcmp(oldUnit, newUnit)
     return
 else
     %Remove Unicode Charaters from oldUnit
