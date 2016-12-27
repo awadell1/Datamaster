@@ -23,10 +23,10 @@ classdef Datamaster < handle
             reportGitInfo;
             
             % Set Datastore Path
-            dm.Datastore = getConfigSetting('Datastore','datastore_path');
+            dm.Datastore = getConfigSetting('datastore_path');
             
             % Load Database
-            mDirPath = getConfigSetting('Datastore','master_directory_path');
+            mDirPath = getConfigSetting('master_directory_path');
             dm.mDir = connectSQLite(mDirPath);
             
             % Get a list of Details and Channels that have been logged

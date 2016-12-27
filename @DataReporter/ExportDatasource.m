@@ -14,13 +14,13 @@ function [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
     startExport = tic;
     try
         %Create a random temp .mat file to export MoTeC Log file to
-        tempSaveLoc = getConfigSetting('Datastore','temp_path');
+        tempSaveLoc = tempname;
         saveFile = sprintf('temp_%.f.mat',1e10*rand);
         saveFile = fullfile(tempSaveLoc,saveFile);
         save(saveFile,'saveFile');
         
         %Download the .ld and .ldx file to the Datastore
-        motecSaveLoc = getConfigSetting('Datastore','motec_path');      %Get the save location from the config file
+        motecSaveLoc = tempname;      %Get the save location from the config file
         [ldPath, ldxPath] = getDatasourceDrive(MoTeCFile,motecSaveLoc); %Download files from Google
         
         %% Export Datasource as .mat
