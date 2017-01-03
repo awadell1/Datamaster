@@ -3,8 +3,28 @@ function [value] = getConfigSetting(Key)
 %   Detailed explanation goes here
 
 %Expected filename for config file
-userConfig = 'config.ini';
-defaultConfig = 'default.ini';
+userConfig = fullfile(Datamaster.getPath, 'config.ini');
+defaultConfig = fullfile(Datamaster.getPath, 'default.ini');
+
+%Check for both config files
+for file = {userConfig, defaultConfig}
+    if ~exist(file{:}, 'file')
+        if strcmp(file{:}, defaultConfig)
+            %Missing Default config file -> throw error
+            errorStruct.message = ['Default config file (default.ini) not found. ',...
+                'Please Pull an up to date copy from the git repo'];
+            errorStruct.identifier = 'Datamaster:MissingConfig';
+            error(errorStruct);
+        elseif strcmp(file{:}, userConfig)
+            %Missing User Config file -> Create empy config file
+            warning(['User config file (config.ini) not found. ',...
+                'Created blank user config file']);
+            
+            %Create Blank file
+            fid = fopen(userConfig, 'w'); fprintf(fid, ' '); fclose(fid);
+        end     
+    end
+end
 
 userValue = getKeyValue(userConfig, Key);
 defaultValue = getKeyValue(defaultConfig, Key);
