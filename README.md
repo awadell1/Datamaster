@@ -10,6 +10,13 @@ Assuming MATLAB is already installed, download and run this setup GUI: [here](ht
 
 If you have not already installed MATLAB, do that now.
 
+You can check that everything was installed correctly by running the following command in MATLAB:
+```
+close all
+dm = Datamaster; ds = dm.getDatasource;
+ds(1:100).Histogram2('Engine_RPM', 'Manifold_Pres',[0, 10000; 70 170], 'unit', {'rpm', 'kPa'});
+```
+
 ## For Mac and Linux Users ##
 Datamaster is built using cross-platform tools (MATLAB and Phython) and has been tested using Linux. However, at present Datamaster is developed solely on a PC and thus other platforms, while not unsupported are largely untested. If you do run into any bug/ missing feature for your platform, please submit a bug/feature request. However given my personal lack of access to non PC platforms, any less than obvious fixes may take time.
 
