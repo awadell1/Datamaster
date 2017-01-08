@@ -10,6 +10,16 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
             dm.mDir.execute('BEGIN');
         end
         
+        %Check if the Log Date and Time were recorded
+        if isfield(Details, 'LogDate') && isfield(Details, 'LogTime')
+            %Use date time found in details instead of file creation date
+            logDatetime = [Details.LogTime ' ' Details.LogDate];
+            logDatetime = datetime(logDatetime, 'InputFormat', 'HH:mm:ss dd/MM/yyyy');
+            logDatetime = datevec(logDatetime);
+            
+            MoTeCFile.createdTime = sprintf('%d-%d-%dT%02d:%02d:%02.3fZ',logDatetime);
+        end
+        
         
         %Create cell array of column names and values
         colNames = {'ldId', 'ldxId', 'OriginHash', 'FinalHash', 'Datetime'};
@@ -34,7 +44,6 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
                 fastinsert(dm.mDir, 'DetailName', 'fieldName', fieldName(indexMissing(i)))
             end
         end
-        
         
         %Record Details
         for i =1:length(fieldName)
@@ -75,7 +84,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
             %Add Channels to ChannelName Table -> Ensure channel is a column
             %array
             for i = 1:length(indexMissing)
-new                dm.mDir.execute('INSERT INTO ChannelName (channelName) VALUES (?)', channels(indexMissing(i)));
+                dm.mDir.execute('INSERT INTO ChannelName (channelName) VALUES (?)', channels(indexMissing(i)));
             end
         end
         
@@ -86,9 +95,10 @@ new                dm.mDir.execute('INSERT INTO ChannelName (channelName) VALUES
                 datasourceId,channels{i});
             dm.mDir.execute(query)
         end
+      
         
-        %Commit Changes to databse
-        dm.mDir.execute('COMMIT');
+%         %Commit Changes to databse
+%         dm.mDir.execute('COMMIT');
     catch e
         %If something goes wrong -> roll back changes
         dm.mDir.execute('ROLLBACK');

@@ -23,10 +23,10 @@ classdef Datamaster < handle
             reportGitInfo;
             
             % Set Datastore Path
-            dm.Datastore = getConfigSetting('datastore_path');
+            dm.Datastore = Datamaster.getConfigSetting('datastore_path');
             
             % Load Database
-            mDirPath = getConfigSetting('master_directory_path');
+            mDirPath = Datamaster.getConfigSetting('master_directory_path');
             dm.mDir = connectSQLite(mDirPath);
             
             % Get a list of Details and Channels that have been logged
@@ -91,6 +91,8 @@ classdef Datamaster < handle
                 '(.*)\\@Datamaster\\Datamaster.m', 'tokens');
             DatamasterPath = DatamasterPath{:}{:};
         end
+        
+        value = getConfigSetting(Key)
         
         
         colormap(name)

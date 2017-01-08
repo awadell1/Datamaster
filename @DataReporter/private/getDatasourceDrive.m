@@ -3,42 +3,41 @@ function [ldLoc, ldxLoc] = getDatasourceDrive(MoTeCFile,savePath)
     % MoTeCFile: Struct w/ the following fields
     %   ld: The file id of the .ld file to download
     %   ldx: The file id of the .ldx file to download
-    % saveLoc: The folder to save the downloaded files to
-    %
-    % saveLoc: Cell array with the fullpaths to where each file is saved:
-    % saveLoc: {ld Filepath, ldx Filepath}
+    % 
+    % ldLoc: filepath where the .ld file is saved
+    % ldxLoc: filepath where the .ldx file is saved
     
-    %Create annon function to create the request url
-    url = @(id) ['https://docs.google.com/uc?id=', id, '&export=download'];
-    
-    %Set Filename for the files (But not extension)
-    savePath = fullfile(savePath, MoTeCFile.ld);
-    
-    %Report Start
+    %Report Start of Download
     fprintf('\n\tDownloading from Google Drive...');
     sTime = tic;
     
-    %Download the .ld and .ldx files
-    ldLoc = retryDownload([savePath '.ld'], url(MoTeCFile.ld));
-    ldxLoc = retryDownload([savePath '.ldx'], url(MoTeCFile.ldx));
+    %Download the .ld and .ldx files to temporary files
+    ldLoc = retryDownload( [tempname '.ld'], MoTeCFile.ld);
+    ldxLoc = retryDownload([tempname, '.ldx'], MoTeCFile.ldx);
     
     %Report Done
     fprintf('done in %3.2f s\n',toc(sTime));tic
-    
 end
 
-function saveLoc = retryDownload(saveLoc,url)
-    %Impliment Exponential Backoff for download
+function saveLoc = retryDownload(saveLoc, fileId)
+    %Download the given Goolge Drive File ID using it's webContentLink
+    % saveLoc: path to save the downloaded file
+    % fileID: the id used by Google to identify a given file
     
     %Setting for back off
     maxTries = 5;       %Max Attempts to make
     pauseTime = 0.5;    %Baseline time to wait
     
+    %Google Drive Service URL
+    gDriveURL = 'https://drive.google.com/uc';
+    
     nTry = 0;
     while nTry < maxTries
         try
             %Attempt to download the file
-            saveLoc = websave(saveLoc,url);
+            saveLoc = websave(saveLoc, gDriveURL,...
+                'id', fileId,...
+                'export', 'download');
             break
         catch e
             %If error is thrown due to timeout -> retry, otherwise rethrow

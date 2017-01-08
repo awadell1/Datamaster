@@ -1,4 +1,4 @@
-function [value] = getConfigSetting(Key)
+function value = getConfigSetting(Key)
 %getConfigSetting returns an iniConfig file for the current user
 %   Detailed explanation goes here
 
@@ -50,7 +50,7 @@ end
 %Replace %Datamaster% with path to Datamaster
 if ischar(value) & strfind(value, '%Datamaster%')
     value = strrep(value, '%Datamaster%',...
-        getConfigSetting('datastore_path'));
+        Datamaster.getConfigSetting('datastore_path'));
     
     %Get Valid File Path
     value = fullfile(value);    

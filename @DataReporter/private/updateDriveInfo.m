@@ -6,7 +6,9 @@ function datasource = updateDriveInfo()
     persistent newFile 
     if isempty(newFile)
         fprintf('Polling Google Drive for new files...')
-        newFile = cell(py.ConnectGoogleDrive.getFileList());
+        client_id = Datamaster.getConfigSetting('client_id');
+        client_secret = Datamaster.getConfigSetting('client_secret');
+        newFile = cell(py.ConnectGoogleDrive.getFileList(client_id, client_secret));
         fprintf('done\n')
     end
     files = newFile;
