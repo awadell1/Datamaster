@@ -6,7 +6,7 @@ function [entry] = getEntry(dm,varargin)
     %Run Search through getIndex
     index = dm.getIndex(varargin{:});
     
-    %% Create Enteries from database
+    %% Create Entries from database
     query = sprintf(['SELECT ChannelLog.entryId, group_concat(ChannelName.channelName) FROM ChannelLog ',...
         'INNER JOIN ChannelName ON ChannelName.id = ChannelLog.channelId ',...
         'WHERE ChannelLog.entryId IN (%s) GROUP BY ChannelLog.entryId'],...
@@ -16,7 +16,7 @@ function [entry] = getEntry(dm,varargin)
     MasterLog = dm.mDir.fetch(sprintf(['SELECT id, OriginHash, FinalHash, Datetime FROM masterDirectory ',...
         'WHERE masterDirectory.id IN (%s)'], strjoin(sprintfc('%d',index),',')));
     
-    % Create Enteries from Logs
+    % Create Entries from Logs
     entry = repmat(struct('Index', [], 'OriginHash', [], 'FinalHash', [], 'Channel', [], 'Detail', [], 'Datetime', []),[size(MasterLog,1),1]);
     
     %If no entries were found skip
@@ -30,8 +30,14 @@ function [entry] = getEntry(dm,varargin)
             %Add Channels to entry
             matchIndex = channelEntryId == index(i);    %Find Record in ChannelLog
             record = ChannelLog(matchIndex,2);    %Extract Channels from ChannelLog
-            record = textscan(record{:},'%s','Delimiter',','); %Extract channels to cell array
-            entry(i).Channel = record{:}; %Extract inner cell array
+
+            %Check if record is empty
+            if ~isempty(record)
+                record = textscan(record{:},'%s','Delimiter',','); %Extract channels to cell array
+                entry(i).Channel = record{:}; %Extract inner cell array
+            else
+                entry(i).Channel = {};
+            end
             
             %Add from MasterLog
             masterIndex = MasterLogIndex == index(i);
