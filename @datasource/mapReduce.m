@@ -3,7 +3,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     
     %Create Input Parser
     persistent p
-    if ~isempty(p) || true
+    if ~isempty(p)
         p = inputParser;
         p.FunctionName = 'mapReduce';
         p.addRequired('ds',             @(x) isa(x, 'datasource') && ~isempty(x));
