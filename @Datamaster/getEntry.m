@@ -30,15 +30,17 @@ function [entry] = getEntry(dm,varargin)
             %Add Channels to entry
             matchIndex = channelEntryId == index(i);    %Find Record in ChannelLog
             record = ChannelLog(matchIndex,2);    %Extract Channels from ChannelLog
-            record = textscan(record{:},'%s','Delimiter',','); %Extract channels to cell array
-            entry(i).Channel = record{:}; %Extract inner cell array
-            
-            %Add from MasterLog
-            masterIndex = MasterLogIndex == index(i);
-            entry(i).Index = MasterLog{masterIndex,1};
-            entry(i).OriginHash = MasterLog{masterIndex,2};
-            entry(i).FinalHash = MasterLog{masterIndex,3};
-            entry(i).Datetime = MasterLog{masterIndex,4};
+            if ~isempty(record)
+                record = textscan(record{:},'%s','Delimiter',','); %Extract channels to cell array
+                entry(i).Channel = record{:}; %Extract inner cell array
+                
+                %Add from MasterLog
+                masterIndex = MasterLogIndex == index(i);
+                entry(i).Index = MasterLog{masterIndex,1};
+                entry(i).OriginHash = MasterLog{masterIndex,2};
+                entry(i).FinalHash = MasterLog{masterIndex,3};
+                entry(i).Datetime = MasterLog{masterIndex,4};
+            end
         end
     end
 end
