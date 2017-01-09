@@ -17,12 +17,18 @@ function [Details] = getDetails(idxFilename)
         str = str{:}{:};
         
         %Extract each field
-        fields = regexpi(str,'<(.+?) Id="(.+?)" Value="(.*?)"( Unit="(.*?)")?','tokens');
+        fields = regexpi(str,'<(.+?)\/>','tokens');
         
         %Create the Details Struct
         for i = 1:length(fields)
             %Grab the current Field sub cell
-            current = fields{i};
+            current = regexpi(fields{i}, '(String|Numeric|DateTime) Id="(.+?)" Value="(.*?)"( Unit="(.*?)")?', 'tokens');
+            %Skip to next field if current is empty
+            if isempty(current{:})
+                continue
+            end
+            
+            current = current{:}{:};
             
             %Match Unit
             unit = regexpi(current{4},'"(.*)"','tokens');

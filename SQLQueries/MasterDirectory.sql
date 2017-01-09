@@ -44,3 +44,6 @@ CREATE TABLE ChannelName(
 	id 				INTEGER 		PRIMARY KEY,
 	channelName		TEXT			NOT NULL
 )
+
+INSERT INTO `ChannelName`(`id`,`channelName`) VALUES (NULL,'Engine_RPM');
+INSERT INTO `DetailName`(`id`,`fieldName`) VALUES (NULL,'TotalLaps');

@@ -41,7 +41,8 @@ function saveLoc = retryDownload(saveLoc, fileId)
             break
         catch e
             %If error is thrown due to timeout -> retry, otherwise rethrow
-            if ~strcmp(e.identifier,'MATLAB:webservices:Timeout')
+            if ~any(strcmp(e.identifier,{'MATLAB:webservices:Timeout',...
+                    'MATLAB:webservices:CopyContentToDataStreamError'}))
                 rethrow(e)
             else
                 fprintf('timeout');
