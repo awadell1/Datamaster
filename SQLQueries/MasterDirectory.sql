@@ -2,6 +2,13 @@
 SQLite Statements to recreate the database used by Datamaster
 */
 
+--Delete Database
+DROP TABLE `masterDirectory`;
+DROP TABLE `DetailLog`;
+DROP TABLE `DetailName`;
+DROP TABLE `ChannelLog`;
+DROP TABLE `ChannelName`;
+
 
 --Turn on Foreign Keys for database
 PRAGMA foreign_keys = on;
@@ -43,7 +50,7 @@ CREATE TABLE ChannelLog(
 CREATE TABLE ChannelName(
 	id 				INTEGER 		PRIMARY KEY,
 	channelName		TEXT			NOT NULL
-)
+);
 
 INSERT INTO `ChannelName`(`id`,`channelName`) VALUES (NULL,'Engine_RPM');
 INSERT INTO `DetailName`(`id`,`fieldName`) VALUES (NULL,'TotalLaps');
