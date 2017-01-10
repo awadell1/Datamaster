@@ -46,14 +46,22 @@ else % Abort and notify User
 end
 
 %% Post Processing If Needed
-
-%Replace %Datamaster% with path to Datamaster
-if ischar(value) & strfind(value, '%Datamaster%')
-    value = strrep(value, '%Datamaster%',...
+if ischar(value) 
+  %Replace %datastore% with datastore_path
+  if strfind(value, '%datastore%')
+    value = strrep(value, '%datastore%',...
         Datamaster.getConfigSetting('datastore_path'));
-    
     %Get Valid File Path
-    value = fullfile(value);    
+    value = fullfile(value);
+  end
+
+  %Replace %Datamaster% with path to Datamaster
+  if strfind(value, '%Datamaster%')
+    value = strrep(value, '%Datamaster%',...
+        Datamaster.getPath);
+    %Get Valid File Path
+    value = fullfile(value);
+  end
 end
 
 end
