@@ -11,7 +11,7 @@ Assuming MATLAB is already installed, download and run this setup GUI: [here](ht
 If you have not already installed MATLAB, do that now.
 
 You can check that everything was installed correctly by running the following command in MATLAB:
-```
+```matlab
 close all
 dm = Datamaster; ds = dm.getDatasource;
 ds(1:100).Histogram2('Engine_RPM', 'Manifold_Pres',[0, 10000; 70 170], 'unit', {'rpm', 'kPa'});
