@@ -18,7 +18,7 @@ ds(1:100).Histogram2('Engine_RPM', 'Manifold_Pres',[0, 10000; 70 170], 'unit', {
 ```
 
 ## For Mac and Linux Users ##
-Datamaster is built using cross-platform tools (MATLAB and Phython) and has been tested using Linux. However, at present Datamaster is developed solely on a PC and thus other platforms, while not unsupported are largely untested. If you do run into any bug/ missing feature for your platform, please submit a bug/feature request. However given my personal lack of access to non PC platforms, any less than obvious fixes may take time.
+Datamaster is built using cross-platform tools (MATLAB and Python) and has been tested using Linux. However, at present Datamaster is developed solely on a PC and thus other platforms, while not unsupported are largely untested. If you do run into any bug/ missing feature for your platform, please submit a bug/feature request. However given my personal lack of access to non PC platforms, any less than obvious fixes may take time.
 
 ## Bug Reporting ##
 Datamaster is still very much in it's infancy, and as such bugs are to be expected. If you do by chance happen to find a bug:
