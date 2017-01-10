@@ -17,7 +17,7 @@ dm = Datamaster; ds = dm.getDatasource;
 ds(1:100).Histogram2('Engine_RPM', 'Manifold_Pres',[0, 10000; 70 170], 'unit', {'rpm', 'kPa'});
 ```
 
-Once installed check out the [wiki](https://github.com/awadell1/Datamaster/wiki) for documentation, examples and troubleshooting guides
+Once installed check out the [wiki](https://github.com/awadell1/Datamaster/wiki) for documentation, examples and troubleshooting guides.
 
 ## For Mac and Linux Users ##
 Datamaster is built using cross-platform tools (MATLAB and Python) and has been tested using Linux. However, at present Datamaster is developed solely on a PC and thus other platforms, while not unsupported are largely untested. If you do run into any bug/ missing feature for your platform, please submit a bug/feature request. However given my personal lack of access to non PC platforms, any less than obvious fixes may take time.
