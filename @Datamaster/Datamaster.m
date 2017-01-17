@@ -108,9 +108,9 @@ classdef Datamaster < handle
     
     %Restricted Access Methods
     methods (Access = ?datasource)
-        function mDir = getMasterDir(dm)
-            %Returns masterDirectory
-            mDir = dm.mDir;
+        function varargout = mDirFetch(dm, varargin)
+            %Run fetch commands against the master directory
+            varargout{:} = dm.mDir.fetch(varargin{:});
         end
     end
     
