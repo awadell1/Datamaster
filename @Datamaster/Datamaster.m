@@ -37,23 +37,30 @@ classdef Datamaster < handle
         function DatastorePath = getDatastore(obj)
             %Returns the Full Path to the Datastore
             DatastorePath = obj.Datastore;
+
         end
         
         function num = numEnteries(dm)
             %Returns the number of Datasources stored in the Datastore
             num = size(dm.mDir,2);
+
+            warning('numEnteries will be removed in a future release')
         end
         
         function dm = updateDetails(dm)
             %Updates the list of details that have been logged in the
             %database
             dm.Details = dm.mDir.fetch('SELECT DetailName.fieldName, DetailName.id FROM DetailName');
+            
+            warning('updateDetails will be removed in a future release')
         end
         
         function dm = updateChannels(dm)
             %Updates the list of channels that have been logged in the
             %database
             dm.Channels = dm.mDir.fetch('SELECT ChannelName.channelname, ChannelName.id FROM ChannelName');
+            
+            warning('updateChannels will be removed in a future release')
         end
         
     end

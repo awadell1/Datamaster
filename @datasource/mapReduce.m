@@ -46,6 +46,10 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     nDatasource = length(ds);
     textprogressbar('Processing Datasources: ', 'new');
     for i = 1:nDatasource
+        %Attempt to load required channels
+        if ~isempty(p.Results.channel)
+            ds(i).loadChannel(p.Results.channel);
+        end
         %Apply mapFunction to each Datasource
         [MapFunOut{i,:}] = mapFun(ds(i));
         

@@ -8,7 +8,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
                 logDatetime = datetime(logDatetime, 'InputFormat', 'HH:mm:ss dd/MM/yyyy');
                 logDatetime = datevec(logDatetime);
                 
-                MoTeCFile.createdTime = sprintf('%d-%d-%dT%02d:%02d:%02.3fZ',logDatetime);
+                MoTeCFile.createdTime = sprintf('%04d-%02d-%02dT%02d:%02d:%02.3fZ',logDatetime);
             end
         end
         
