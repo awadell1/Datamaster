@@ -36,7 +36,7 @@ def getFileList(client_id, client_secret):
     while True:
         # Grab a page of files from the server
         response = drive.files().list(q='fileExtension = \'ld\' or  fileExtension = \'ldx\'',
-                                      fields='nextPageToken, files(id, name, md5Checksum, modifiedTime)',
+                                      fields='nextPageToken, files(id, name, md5Checksum, modifiedTime, webContentLink)',
                                       pageSize=1000,
                                       orderBy='modifiedTime',
                                       pageToken=pageToken).execute()

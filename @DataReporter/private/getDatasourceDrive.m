@@ -12,40 +12,36 @@ function [ldLoc, ldxLoc] = getDatasourceDrive(MoTeCFile,savePath)
     sTime = tic;
     
     %Download the .ld and .ldx files to temporary files
-    ldLoc = retryDownload( [tempname '.ld'], MoTeCFile.ld);
-    ldxLoc = retryDownload([tempname, '.ldx'], MoTeCFile.ldx);
+    ldLoc = retryDownload( [tempname '.ld'], MoTeCFile.ldLink);
+    ldxLoc = retryDownload([tempname, '.ldx'], MoTeCFile.ldxLink);
     
     %Report Done
     fprintf('done in %3.2f s\n',toc(sTime));tic
 end
 
-function saveLoc = retryDownload(saveLoc, fileId)
+function saveLoc = retryDownload(saveLoc, url)
     %Download the given Goolge Drive File ID using it's webContentLink
     % saveLoc: path to save the downloaded file
-    % fileID: the id used by Google to identify a given file
+    % url: Link used to download the file
     
     %Setting for back off
     maxTries = 5;       %Max Attempts to make
     pauseTime = 0.5;    %Baseline time to wait
-    
-    %Google Drive Service URL
-    gDriveURL = 'https://drive.google.com/uc';
-    
+        
     nTry = 0;
     while nTry < maxTries
         try
             %Attempt to download the file
-            saveLoc = websave(saveLoc, gDriveURL,...
-                'id', fileId,...
-                'export', 'download');
+            saveLoc = websave(saveLoc, url);
             break
         catch e
             %If error is thrown due to timeout -> retry, otherwise rethrow
             if ~any(strcmp(e.identifier,{'MATLAB:webservices:Timeout',...
-                    'MATLAB:webservices:CopyContentToDataStreamError'}))
+                    'MATLAB:webservices:CopyContentToDataStreamError',...
+                    'MATLAB:webservices:HTTP404StatusCodeError'}))
                 rethrow(e)
             else
-                fprintf('timeout');
+                fprintf('timeout...');
                 pause(pauseTime*2^nTry);
                 nTry = nTry +1;
             end
