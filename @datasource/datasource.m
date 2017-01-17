@@ -6,7 +6,7 @@ classdef datasource < handle
         Data = struct;          %Structure of Logged Data
         Entry = struct;         %Structure of masterDirectory
         Channel = {};           %Cell Array of logged channels
-        Detail = struct;        %Structure of Details
+        Detail = [];        %Structure of Details
         Gate = struct;          %Sturcture for gating function
         dm = [];                %Handle to Datamaster Object
         MatPath = '';           %Fullpath to .mat file
@@ -36,6 +36,11 @@ classdef datasource < handle
         end
         
         function clearData(ds,varargin)
+            %Used to clear channel data loaded into memory by the datasource.
+            
+            %Assert that ds is singluar
+            assert(length(ds) ==1, 'clearData only supports singular datasources');
+
             switch nargin
                 case 1
                     %Clear Loaded Data from memory

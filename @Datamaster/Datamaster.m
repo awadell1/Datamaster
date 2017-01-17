@@ -106,5 +106,13 @@ classdef Datamaster < handle
         
     end
     
+    %Restricted Access Methods
+    methods (Access = ?datasource)
+        function mDir = getMasterDir(dm)
+            %Returns masterDirectory
+            mDir = dm.mDir;
+        end
+    end
+    
 end
 

@@ -1,4 +1,4 @@
-%Create Datamaster Object
+%% Create Datamaster Object
 dm = Datamaster;
 assert(isa(dm, 'Datamaster'))
 
@@ -7,7 +7,7 @@ path1 = Datamaster.getConfigSetting('datastore_path');
 path2 = dm.getDatastore;
 assert(strcmp(path1, path2))
 
-%% Check getDatasource
+% Check getDatasource
 ds = dm.getDatasource;
 assert(isa(ds, 'datasource'))
 
@@ -31,12 +31,12 @@ dsNum = dm.getDatasource('limit', num);
 assert(length(dsNum) == num);
 
 %Search by Channel - Single Channel
-ds = dm.getDatasource('channel', 'Engine_RPM')
+ds = dm.getDatasource('channel', 'Engine_RPM');
 channels = ds(randDs(ds)).getLogged;
 assert(any(strcmp('Engine_RPM', channels)));
 
 %Search by Multiple - Single Channel
-ds = dm.getDatasource('channel', {'Engine_RPM', 'Engine_Torque'})
+ds = dm.getDatasource('channel', {'Engine_RPM', 'Engine_Torque'});
 channels = ds(randDs(ds)).getLogged;
 assert(any(strcmp('Engine_RPM', channels)));
 assert(any(strcmp('Engine_Torque', channels)));
