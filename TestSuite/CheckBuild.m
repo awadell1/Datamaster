@@ -5,7 +5,7 @@ wiki = Datamaster.getConfigSetting('wiki');
 exampleCode = getExampleCode(wiki);
 
 %Run Tests
-runtests(exampleCode(:, 1), 'UseParallel', true)
+runtests([pwd; exampleCode(:, 1)])
 
 %Clean up
 for i = 1:length(exampleCode)
@@ -32,7 +32,7 @@ exampleCode = {};
                 for j = 1:length(code)
                     % Generate Test Code Name
                     [~, name] = fileparts(file(i).name);
-                    name = sprintf('%s%02d.m', name, floor(100* rand));
+                    name = sprintf('%s_%02d.m', name, j);
                     exampleCode{end+1, 1} = fullfile(tempdir, name);
                     
                     %Create File

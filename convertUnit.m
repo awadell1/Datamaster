@@ -13,6 +13,7 @@ end
 persistent ureg
 if isempty(ureg)
     ureg = py.pint.UnitRegistry;
+    ureg.load_definitions(fullfile(Datamaster.getPath, 'UnitDefine.txt'));
 end
 
 %Parse Input
