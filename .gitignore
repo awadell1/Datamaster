@@ -5,7 +5,7 @@ Datastore/
 
 #Ignore folders
 html/**
-__pycache__/**
+**/__pycache__/
 Dependencies/**
 
 #Ignore Config Files

@@ -13,15 +13,12 @@ function [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
     fprintf('Exporting: %s',MoTeCFile.OriginHash);
     startExport = tic;
     try
-        %Create a random temp .mat file to export MoTeC Log file to
-        tempSaveLoc = tempname;
-        saveFile = sprintf('temp_%.f.mat',1e10*rand);
-        saveFile = fullfile(tempSaveLoc,saveFile);
-        save(saveFile,'saveFile');
+        %Create a temporary mat file that will be overwritten by i2Pro
+        saveFile = [tempname '.mat'];
+        save(saveFile, 'saveFile');
         
-        %Download the .ld and .ldx file to the Datastore
-        motecSaveLoc = tempname;      %Get the save location from the config file
-        [ldPath, ldxPath] = getDatasourceDrive(MoTeCFile,motecSaveLoc); %Download files from Google
+        %Download the .ld and .ldx file from Google Drive
+        [ldPath, ldxPath] = getDatasourceDrive(MoTeCFile);
         
         %% Export Datasource as .mat
         %Export to the Temp File then copy to a new file

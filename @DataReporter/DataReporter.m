@@ -10,6 +10,12 @@ classdef DataReporter
     
     methods
         function dr = DataReporter()
+            %Add Python Folder to search path
+            P = py.sys.path;
+            pyFolder = fullfile(Datamaster.getPath, 'Python');
+            if count(P,pyFolder) == 0
+                insert(P,int32(0),pyFolder);
+            end
         end
         
         %% Function Signitures

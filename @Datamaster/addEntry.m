@@ -1,13 +1,15 @@
 function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
     try
-        
-        %Start SQL Transaction
-        try
-            dm.mDir.execute('BEGIN');
-        catch
-            %Catch errors caused by old transactions
-            dm.mDir.execute('ROLLBACK');
-            dm.mDir.execute('BEGIN');
+        %Check if the Log Date and Time were recorded
+        if isfield(Details, 'LogDate') && isfield(Details, 'LogTime')
+            try %#ok<TRYNC>
+                %Use date time found in details instead of file creation date
+                logDatetime = [Details.LogTime ' ' Details.LogDate];
+                logDatetime = datetime(logDatetime, 'InputFormat', 'HH:mm:ss dd/MM/yyyy');
+                logDatetime = datevec(logDatetime);
+                
+                MoTeCFile.createdTime = sprintf('%04d-%02d-%02dT%02d:%02d:%02.3fZ',logDatetime);
+            end
         end
         
         
@@ -22,10 +24,11 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         query = sprintf('select id from MasterDirectory where FinalHash=''%s''',FinalHash);
         datasourceId = dm.mDir.fetch(query); datasourceId = datasourceId{:};
         
+        %% Check for Missing Fields
         %Add Missing Names to Details Logged
         DetailName = dm.mDir.fetch('select fieldName from DetailName');
         fieldName = fieldnames(Details); fieldName = fieldName(:);
-        [~,indexMissing] = setxor(fieldName,DetailName);
+        [~,indexMissing] = setxor(fieldName, DetailName);
         
         %Check if no Detail Names are missing
         if ~isempty(indexMissing)
@@ -35,6 +38,26 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
             end
         end
         
+        %Add missing Channels
+        ChannelName = dm.mDir.fetch('select id, channelName from ChannelName');
+        if ~isempty(ChannelName)
+            [~,indexMissing] = setxor(channels,ChannelName(:,2));
+        else
+            indexMissing = true(length(channels),1);
+        end
+        
+        %Check if no channels are missing
+        if ~isempty(indexMissing)
+            %Add Channels to ChannelName Table -> Ensure channel is a column array
+            for i = 1:length(indexMissing)
+                dm.mDir.execute('INSERT INTO ChannelName (channelName) VALUES (?)', channels(indexMissing(i)));
+            end
+        end
+        
+        %Commit Changes
+        dm.mDir.conn.commit
+        
+        %% Add Enteries
         
         %Record Details
         for i =1:length(fieldName)
@@ -62,23 +85,6 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
             end
         end
         
-        %Add missing Channels
-        ChannelName = dm.mDir.fetch('select id, channelName from ChannelName');
-        if ~isempty(ChannelName)
-            [~,indexMissing] = setxor(channels,ChannelName(:,2));
-        else
-            indexMissing = true(length(channels),1);
-        end
-        
-        %Check if no channels are missing
-        if ~isempty(indexMissing)
-            %Add Channels to ChannelName Table -> Ensure channel is a column
-            %array
-            for i = 1:length(indexMissing)
-new                dm.mDir.execute('INSERT INTO ChannelName (channelName) VALUES (?)', channels(indexMissing(i)));
-            end
-        end
-        
         %Record Channels Logged
         for i = 1:length(channels)
             query = sprintf(['INSERT INTO ChannelLog (entryId, channelId) ',...
@@ -87,13 +93,13 @@ new                dm.mDir.execute('INSERT INTO ChannelName (channelName) VALUES
             dm.mDir.execute(query)
         end
         
-        %Commit Changes to databse
-        dm.mDir.execute('COMMIT');
+        %Commit Changes
+        dm.mDir.conn.commit
     catch e
-        %If something goes wrong -> roll back changes
-        dm.mDir.execute('ROLLBACK');
+        %Rollback Changes
+        dm.mDir.conn.rollback();
         
-        %Rethrow error
+        %Rethrow Error
         rethrow(e);
     end
 end

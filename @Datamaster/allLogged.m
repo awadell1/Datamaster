@@ -1,9 +1,9 @@
-function LoggedParameters = allLogged(dm,varargin)
+function varargout = allLogged(dm,varargin)
     % Returns a list of every parameter logged for the requested
     % Datasources. Uses getEntry to provide search
     
     persistent p
-    if isempty(p)% || true
+    if isempty(p)
         p = inputParser;
         p.FunctionName = 'allLogged';
         addRequired(p,'dm',@(x) isa(x,'Datamaster'));
@@ -35,6 +35,11 @@ function LoggedParameters = allLogged(dm,varargin)
         %Output String
         fprintf(formatStr, LoggedParameters{:})
         fprintf('\n')
+
+        varargout = {};
+    else
+        %Return a cell array of the logged parameters
+        varargout{1} = LoggedParameters;
     end
 end
 

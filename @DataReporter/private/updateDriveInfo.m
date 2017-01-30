@@ -2,14 +2,12 @@ function datasource = updateDriveInfo()
     %Import Python Module for downloading Log File metadata
     import py.ConnectGoogleDrive.*
 
-    % Only request new files from google if missing
-    persistent newFile 
-    if isempty(newFile)
-        fprintf('Polling Google Drive for new files...')
-        newFile = cell(py.ConnectGoogleDrive.getFileList());
-        fprintf('done\n')
-    end
-    files = newFile;
+    % Poll Google Drive for missing files
+    fprintf('Polling Google Drive for new files...')
+    client_id = Datamaster.getConfigSetting('client_id');
+    client_secret = Datamaster.getConfigSetting('client_secret');
+    files = cell(py.ConnectGoogleDrive.getFileList(client_id, client_secret));
+    fprintf('done\n')
     
     %Convert from py.dict to struct
     files = cellfun(@struct,files,'UniformOutput',false);
@@ -59,7 +57,8 @@ function datasource = updateDriveInfo()
     ldIndex = ldIndex(ldTemp); ldxIndex = ldxIndex(ldxTemp);
     
     %Consolidate datasources into a paired array
-    datasource = struct('OriginHash',{},'ld',{},'ldx',{},'name',{});
+    datasource = struct('OriginHash',{},'ld',{},'ldx',{},'name',{},...
+                        'ldLink', {}, 'ldxLink', {});
     
     %Start at i = length(ldIndex) to set datasource length
     for i = length(ldIndex):-1:1
@@ -70,6 +69,8 @@ function datasource = updateDriveInfo()
         datasource(i).ldx = files(ldxIndex(i)).id;
         datasource(i).name = files(ldIndex(i)).name;
         datasource(i).createdTime = files(ldIndex(i)).modifiedTime;
+        datasource(i).ldLink = files(ldIndex(i)).webContentLink;
+        datasource(i).ldxLink = files(ldxIndex(i)).webContentLink;
     end
   
     

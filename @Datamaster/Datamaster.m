@@ -23,10 +23,10 @@ classdef Datamaster < handle
             reportGitInfo;
             
             % Set Datastore Path
-            dm.Datastore = getConfigSetting('datastore_path');
+            dm.Datastore = Datamaster.getConfigSetting('datastore_path');
             
             % Load Database
-            mDirPath = getConfigSetting('master_directory_path');
+            mDirPath = Datamaster.getConfigSetting('master_directory_path');
             dm.mDir = connectSQLite(mDirPath);
             
             % Get a list of Details and Channels that have been logged
@@ -37,23 +37,30 @@ classdef Datamaster < handle
         function DatastorePath = getDatastore(obj)
             %Returns the Full Path to the Datastore
             DatastorePath = obj.Datastore;
+
         end
         
         function num = numEnteries(dm)
             %Returns the number of Datasources stored in the Datastore
             num = size(dm.mDir,2);
+
+            warning('numEnteries will be removed in a future release')
         end
         
         function dm = updateDetails(dm)
             %Updates the list of details that have been logged in the
             %database
             dm.Details = dm.mDir.fetch('SELECT DetailName.fieldName, DetailName.id FROM DetailName');
+            
+            warning('updateDetails will be removed in a future release')
         end
         
         function dm = updateChannels(dm)
             %Updates the list of channels that have been logged in the
             %database
             dm.Channels = dm.mDir.fetch('SELECT ChannelName.channelname, ChannelName.id FROM ChannelName');
+            
+            warning('updateChannels will be removed in a future release')
         end
         
     end
@@ -92,9 +99,19 @@ classdef Datamaster < handle
             DatamasterPath = DatamasterPath{:}{:};
         end
         
+        value = getConfigSetting(Key)
+        
         
         colormap(name)
         
+    end
+    
+    %Restricted Access Methods
+    methods (Access = ?datasource)
+        function varargout = mDirFetch(dm, varargin)
+            %Run fetch commands against the master directory
+            varargout{:} = dm.mDir.fetch(varargin{:});
+        end
     end
     
 end

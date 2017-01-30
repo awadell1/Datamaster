@@ -3,7 +3,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     
     %Create Input Parser
     persistent p
-    if ~isempty(p) || true
+    if isempty(p)
         p = inputParser;
         p.FunctionName = 'mapReduce';
         p.addRequired('ds',             @(x) isa(x, 'datasource') && ~isempty(x));
@@ -46,6 +46,10 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     nDatasource = length(ds);
     textprogressbar('Processing Datasources: ', 'new');
     for i = 1:nDatasource
+        %Attempt to load required channels
+        if ~isempty(p.Results.channel)
+            ds(i).loadChannel(p.Results.channel);
+        end
         %Apply mapFunction to each Datasource
         [MapFunOut{i,:}] = mapFun(ds(i));
         

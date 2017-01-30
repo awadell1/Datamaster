@@ -6,7 +6,7 @@ classdef datasource < handle
         Data = struct;          %Structure of Logged Data
         Entry = struct;         %Structure of masterDirectory
         Channel = {};           %Cell Array of logged channels
-        Detail = struct;        %Structure of Details
+        Detail = [];        %Structure of Details
         Gate = struct;          %Sturcture for gating function
         dm = [];                %Handle to Datamaster Object
         MatPath = '';           %Fullpath to .mat file
@@ -25,40 +25,7 @@ classdef datasource < handle
         function channels = getLogged(ds)
             channels = ds.Entry.Channel(:);
         end
-        
-        function detail = getDetail(ds,Detail)
-            %Get a sepecfic detail from Detail Log
-            
-            %Assert that ds is singluar
-            assert(length(ds) ==1, 'getDetails only supports singular datasources');
-            
-            %Load Details if missing
-            if isempty(ds.Detail)
-                %Fetch Details from datastore
-                DetailLog = ds.dm.mDir.sqlite(sprintf(['SELECT DetailLog.entryId, '...
-                    'DetailName.fieldName, DetailLog.value, DetailLog.unit FROM DetailLog ',...
-                    'INNER JOIN DetailName ON DetailName.id = DetailLog.fieldId ',...
-                    'WHERE DetailLog.entryId IN (%s)'], strjoin(sprintfc('%d',ds.Entry.Index),',')));
                 
-                %Add DetailLog records to Details
-                for j = 1:length(DetailLog)
-                    if strcmp(DetailLog{j,4},'null')
-                        ds.Detail.(DetailLog{j,2}) = DetailLog{j,3};
-                    else
-                        ds.Detail.(DetailLog{j,2}).Value = DetailLog{j,3};
-                        ds.Detail.(DetailLog{j,2}).Unit = DetailLog{j,4};
-                    end
-                end
-            end
-            
-            %Check if Detail exist
-            if isfield(ds.Detail, Detail)
-                detail = ds.Detail.Detail;  %Return Detail
-            else
-                detail = '';    %Detail is missing return empty
-            end
-        end
-        
         function entry = getEntry(ds)
             
             %Assert that ds is singluar
@@ -69,6 +36,11 @@ classdef datasource < handle
         end
         
         function clearData(ds,varargin)
+            %Used to clear channel data loaded into memory by the datasource.
+            
+            %Assert that ds is singluar
+            assert(length(ds) ==1, 'clearData only supports singular datasources');
+
             switch nargin
                 case 1
                     %Clear Loaded Data from memory
@@ -79,6 +51,7 @@ classdef datasource < handle
                     end
             end
         end
+        
         %Public Function Signitures
         channel = getChannel(ds,chanName,varargin)
         
@@ -86,6 +59,10 @@ classdef datasource < handle
         
         openInMoTeC(ds)
         
+        loadChannel(ds,channelNames)
+
+        detail = getDetail(ds,Detail)
+
         duration = driveTime(ds,varargin)
         
         newTime = Sync(varargin)
@@ -95,41 +72,6 @@ classdef datasource < handle
         varargout = mapReduce(ds, mapFun, reduceFun, varargin)
         
         [cdf_2, x, y, duration] = CDF2(ds,varargin)
-    end
-    
-    methods (Access = public)
-        function loadChannel(ds,channelNames)
-            
-            %Force channel names into a cell array
-            if ~iscell(channelNames)
-                channelNames = {channelNames};
-            end
-            
-            %Loop over each datasource
-            for i = 1:length(ds)
-                %Find missing channels
-                isMissing = ~isfield(ds(i).Data,channelNames);
-                
-                %Load Missing Channels
-                if any(isMissing)
-                    newData = load(ds(i).MatPath,channelNames{isMissing});
-                    
-                    %Check that missing was loaded
-                    assert(all(isfield(newData, channelNames(isMissing))),...
-                            'Channel Not Logged');
-                    
-                    %Append to Data
-                    vars = fieldnames(newData);
-                    for j = 1:length(vars)
-                        ds(i).Data.(vars{j}) = newData.(vars{j});
-                        
-                        %Replace ° with def
-                        ds(i).Data.(vars{j}).Units = ...
-                            strrep(newData.(vars{j}).Units, '°', 'deg');
-                    end
-                end
-            end
-        end
     end
     
 end

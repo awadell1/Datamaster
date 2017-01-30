@@ -54,13 +54,18 @@ classdef sqlite
 end
 
 function matData = py2Mat(pyData)
-    switch true
-        case isa(pyData, 'py.str') || isa(pyData, 'py.unicode')
+    switch class(pyData)
+        case 'py.str'
             %Convert py.str to char
             matData = char(pyData);
-        case isa(pyData, 'py.int')
+        case 'py.unicode'
+            %Convert py.unicode to char
+            matData = char(pyData);
+        case 'py.int'
             %Convert py.int to double
             matData = double(pyData);
+        case 'py.NoneType'
+            matData = [];
         otherwise
             %Leave as is
             matData = pyData;
