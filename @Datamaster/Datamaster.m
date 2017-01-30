@@ -35,28 +35,35 @@ classdef Datamaster < handle
             %% Check for Updates - But Only once per session
             persistent flagChecked
             if isempty(flagChecked)
-                %Move to the Datamaster folder
-                savedCd = cd; cd(Datamaster.getPath);
+                try
+                    %Move to the Datamaster folder
+                    savedCd = cd; cd(Datamaster.getPath);
 
-                %Fetch updates from remote
-                [success, ~] = system('git fetch');
-                assert(success==0, 'Error fetching updates from remote');
+                    %Fetch updates from remote
+                    [success, ~] = system('git fetch');
+                    assert(success==0, 'Error fetching updates from remote');
 
-                %Check Current Status
-                [success, str] = system('git status');
-                assert(success==0, 'Error reading git repo status');
+                    %Check Current Status
+                    [success, str] = system('git status');
+                    assert(success==0, 'Error reading git repo status');
 
-                %Get status
-                status = regexpi(str, 'Your branch is behind ''(.+)'' by (\d+)', 'tokens');
-                
-                %Report to user
-                if ~isempty(status)
-                    warning(['Updates are avaliable. ',...
-                    'Run <a href="matlab:DatamasterSetup">Datamaster Setup</a> to Update']); 
+                    %Get status
+                    status = regexpi(str, 'Your branch is behind ''(.+)'' by (\d+)', 'tokens');
+
+                    %Report to user
+                    if ~isempty(status)
+                        warning(['Updates are avaliable. ',...
+                        'Run <a href="matlab:DatamasterSetup">Datamaster Setup</a> to Update']); 
+                    end
+
+                    %Return to original directory
+                    cd(savedCd); flagChecked = true;
+                catch
+                    %Warn user that we were unable to check for updates but
+                    %don't recheck this session
+                    warning('Unable to check for updates');
+                    flagChecked = true;
                 end
-                
-                %Return to original directory
-                cd(savedCd); flagChecked = true;
             end
         end
         
