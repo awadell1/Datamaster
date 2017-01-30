@@ -89,7 +89,7 @@ valid = true;
 if isa(channel,'cell')
     i = 1;
     while i <= length(channel) && valid
-        %Recursivly Validate Each entry in the cell
+        %Recursively Validate Each entry in the cell
         valid = valid && validateChannel(ds,channel{i});
         i = i+1;
     end

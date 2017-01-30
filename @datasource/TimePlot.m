@@ -24,6 +24,6 @@ function ax = TimePlot(ds,varargin)
     channel = ds.getChannel(chanName, 'unit', unit);
     plot(ax, channel.Time,channel.Value);
         
-    %Anotate Plot
+    %Annotate Plot
     xlabel('Time [s]')
     ylabel(sprintf('[%s]',unit));

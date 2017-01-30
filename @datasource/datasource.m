@@ -1,5 +1,5 @@
 classdef datasource < handle
-    %Class for structing MoTeC Log Data and supporting documentation
+    %Class for accessing data stored in datasources
     
     properties (Access = private)
         Index = [];             %Location of Entry in datastore
@@ -7,9 +7,9 @@ classdef datasource < handle
         Entry = struct;         %Structure of masterDirectory
         Channel = {};           %Cell Array of logged channels
         Detail = [];        %Structure of Details
-        Gate = struct;          %Sturcture for gating function
+        Gate = struct;          %Structure for gating function
         dm = [];                %Handle to Datamaster Object
-        MatPath = '';           %Fullpath to .mat file
+        MatPath = '';           %Full path to .mat file
     end
     
     methods
@@ -28,7 +28,7 @@ classdef datasource < handle
                 
         function entry = getEntry(ds)
             
-            %Assert that ds is singluar
+            %Assert that ds is singular
             assert(length(ds) ==1, 'getDetails only supports singular datasources');
             
             %Return Entry
@@ -38,7 +38,7 @@ classdef datasource < handle
         function clearData(ds,varargin)
             %Used to clear channel data loaded into memory by the datasource.
             
-            %Assert that ds is singluar
+            %Assert that ds is singular
             assert(length(ds) ==1, 'clearData only supports singular datasources');
 
             switch nargin
@@ -52,7 +52,7 @@ classdef datasource < handle
             end
         end
         
-        %Public Function Signitures
+        %Public Function Signatures
         channel = getChannel(ds,chanName,varargin)
         
         TimePlot(ds,varargin)

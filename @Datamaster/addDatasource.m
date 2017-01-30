@@ -9,9 +9,9 @@ function FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
         
         %Convert Double Precision values to signal precision MoTeC Logs
         %data using ~12-14 bits per sample, thus using a 32 bit float
-        %(single-precision float) more then sufficent to store the data. By
+        %(single-precision float) more then sufficient to store the data. By
         %not storing samples as a double (64 bits), the final file size is
-        %reduced by ~33%, with marginal errors due to tuncation (On the
+        %reduced by ~33%, with marginal errors due to truncation (On the
         %order of 1e-6)
         channels = fieldnames(ds);
         for i = 1:length(channels)
@@ -37,7 +37,7 @@ function FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
         %Add Details to temporary mat file
         ds.Details = Details;
         
-        %Resave temporary mat file using v7
+        %Re-save temporary mat file using v7
         save(saveFile,'-struct','ds','-v7');
         
         %Compute Hash of Datasource

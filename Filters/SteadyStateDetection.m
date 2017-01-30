@@ -10,7 +10,7 @@ function [steady, time] = SteadyStateDetection(ds, channelName, tWindow, maxErro
     %Set Window size
     k = floor(tWindow/mean(diff(time)));
     
-    %Intalize array of channel data for each window period
+    %Initialize array of channel data for each window period
     nWindow = 2*k +1;
     dev = zeros(length(data), nWindow);
     

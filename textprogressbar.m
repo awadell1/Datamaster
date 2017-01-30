@@ -1,6 +1,6 @@
 function textprogressbar(c, varargin)
 % This function creates a text progress bar. It should be called with a 
-% STRING argument to initialize and terminate. Otherwise the number correspoding 
+% STRING argument to initialize and terminate. Otherwise the number corresponding 
 % to progress in % should be supplied.
 % INPUTS:   C   Either: Text string to initialize or terminate 
 %                       Percentage number to show progress
@@ -15,13 +15,13 @@ function textprogressbar(c, varargin)
 % Inspired by: http://blogs.mathworks.com/loren/2007/08/01/monitoring-progress-of-a-calculation/
 
 %% Initialization
-persistent strCR;           %   Carriage return pesistent variable
+persistent strCR;           %   Carriage return persistent variable
 
 if nargin == 2
     strCR =[];
 end
 
-% Vizualization parameters
+% Visualization parameters
 strPercentageLength = 10;   %   Length of percentage string (must be >5)
 strDotsMaximum      = 10;   %   The total number of dots in a progress bar
 

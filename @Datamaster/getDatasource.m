@@ -1,7 +1,7 @@
 function ds = getDatasource(dm,varargin)
     %Function to handle extracting a datasource from Datamaster
     
-    %Get Enteries for requested datasource
+    %Get Entries for requested datasource
     entry = dm.getEntry(varargin{:});
     
     %Access requested datasources

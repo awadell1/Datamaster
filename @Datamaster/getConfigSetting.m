@@ -16,7 +16,7 @@ for file = {userConfig, defaultConfig}
             errorStruct.identifier = 'Datamaster:MissingConfig';
             error(errorStruct);
         elseif strcmp(file{:}, userConfig)
-            %Missing User Config file -> Create empy config file
+            %Missing User Config file -> Create empty config file
             warning(['User config file (config.ini) not found. ',...
                 'Created blank user config file']);
             

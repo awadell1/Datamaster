@@ -20,7 +20,7 @@ ds4 = dm.getDatasource('StartDate', '2016-03-01', 'EndDate', '2016-02-01');
 
 assert(length(ds1) < length(ds2)); %Check EndDate
 assert(length(ds1) < length(ds3)); %Check StartDate
-assert(length(ds4) == 0); %Invalid Daterange
+assert(length(ds4) == 0); %Invalid Date range
 
 %Helper for picking a random datasource
 randDs = @(ds) floor(length(ds) * rand) +1;

@@ -1,5 +1,5 @@
 function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
-    %Function for appling a function (mapFun) to each datasource
+    %Function for applying a function (mapFun) to each datasource
     
     %Create Input Parser
     persistent p
@@ -26,7 +26,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
         %Find datasources with the required channels
         hasRequired = dm.getIndex('channel', p.Results.channel);
         
-        %Get indices of the current datasources
+        %Get the index of the current datasources
         currentIndex = [ds.Index];
         
         %Filter out datasource missing all required variables
@@ -39,7 +39,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
         end
     end
     
-    %Initalize array for holding results
+    %Initialize array for holding results
     MapFunOut = cell(length(ds), abs(nargout(mapFun)));
     
     %% Loop over each datasource
@@ -61,7 +61,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     end
     textprogressbar('done');
     
-    %Expand MapFunOut to seperate each output of mapFun
+    %Expand MapFunOut to separate each output of mapFun
     results = cell(size(MapFunOut,2),1);
     for i = 1:size(MapFunOut,2)
         %Keep results as a cell array
@@ -70,7 +70,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     
     %% Pass the consolidated outputs of mapFun to reduceFun
     
-    %Initalize varargout to capture all the outputs of reduceFun
+    %Initialize varargout to capture all the outputs of reduceFun
     varargout = cell(1,nargout(reduceFun));
     
     %Run reduceFun

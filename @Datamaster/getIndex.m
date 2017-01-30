@@ -11,7 +11,7 @@ function [index] = getIndex(dm, varargin)
     %   Example: 'channel', {'Engine_RPM', 'Throttle_Pos'} or 'channel', 'Engine_RPM'
     %
     % Output:
-    % index: array of id intergers for Datasource from masterDirectory
+    % index: array of id integers for Datasource from masterDirectory
     
     
     %% Create Persistent Input Parser to handle reading inputs
@@ -30,7 +30,7 @@ function [index] = getIndex(dm, varargin)
         % Add Parameter to search by channel
         addParameter(p,'channel',   [],     @(x) ischar(x) || iscell(x));
         
-        % Add a Parameter to a date range of intererst
+        % Add a Parameter to a date range of interest
         addParameter(p,'StartDate', [],     @(x) validateDatetime(x));
         addParameter(p,'EndDate',   [],     @(x) validateDatetime(x));
         
@@ -54,7 +54,7 @@ function [index] = getIndex(dm, varargin)
         %If no arguments are supplied return everything
         index = dm.mDir.fetch('SELECT id FROM masterDirectory');
     elseif ~strcmp(Hash,'')
-        %Return Database enteries for that contain the supplied hash
+        %Return Database entries for that contain the supplied hash
         if iscellstr(Hash)
             %Join hashes in to a list of hashes
             hashStr = strjoin(Hash,''',''');
@@ -86,7 +86,7 @@ function [index] = getIndex(dm, varargin)
         
         % Create search query for details
         if ~isempty(query)
-            %Concat queries and add to fullQuery
+            %concatenate queries and add to fullQuery
             fullQuery{end+1} = sprintf(['SELECT masterDirectory.id FROM DetailLog ',...
                 'INNER JOIN DetailName ON DetailName.id = DetailLog.fieldId ',...
                 'INNER JOIN masterDirectory ON masterDirectory.id = DetailLog.entryId ',...

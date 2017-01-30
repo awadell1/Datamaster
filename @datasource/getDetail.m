@@ -1,7 +1,7 @@
 function value = getDetail(ds, fieldName)
-%Get a sepecfic detail from Detail Log
+%Get a specific detail from Detail Log
 
-%Assert that ds is singluar
+%Assert that ds is singular
 assert(length(ds) ==1, 'getDetails only supports singular datasources');
 
 %Load Details if missing

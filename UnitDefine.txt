@@ -1,4 +1,4 @@
-# Definition of additonal units for use
+# Definition of additional units for use
 
 # G Force
 G = gravity

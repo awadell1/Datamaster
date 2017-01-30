@@ -9,7 +9,7 @@ if ~isempty(p) || true
     p.addOptional('newUnit', 'base',    @ischar);
 end
 
-%Get Quanity Object
+%Get Quantity Object
 persistent ureg
 if isempty(ureg)
     ureg = py.pint.UnitRegistry;
@@ -29,7 +29,7 @@ if strcmp(oldUnit, '')
 elseif strcmp(oldUnit, newUnit)
     unit = oldUnit;
 else
-    %Remove Unicode Charaters from oldUnit
+    %Remove Unicode Characters from oldUnit
     oldUnit = strrep(oldUnit, '°', 'deg');  %Remove Degree symbol
     oldUnit = strrep(oldUnit, '·', '*');    %Remove Times symbol
     oldUnit = strrep(oldUnit, 'psi a', 'psi');    %Remove Times symbol
@@ -40,7 +40,7 @@ else
     %Convert to Pint Quantity
     valueOld = ureg.Quantity(py.numpy.array(value), oldUnit);
     
-    %Convert Quanity to desired Unit
+    %Convert Quantity to desired Unit
     if strcmp(newUnit, 'base')
         %Convert to base unit
         valueNew = valueOld.to_base_units();

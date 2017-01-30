@@ -18,7 +18,7 @@ classdef DataReporter
             end
         end
         
-        %% Function Signitures
+        %% Function Signatures
         stats = RefreshDatastore(dr)
         
         

@@ -2,9 +2,9 @@ function stats = RefreshDatastore(dr)
     %Searches the ADL3 Data Folder on Google Drive for any new MoTeC Log
     %Files. New Log Files are then exported and added to the Datastore by
     %Datamaster.
-    %Also records summary satistics such as number of new, modified and
+    %Also records summary statistics such as number of new, modified and
     %corrupt log files currently on the Google Drive.
-    %Returns a cell array containg the OriginHashes of all newly exported
+    %Returns a cell array containing the OriginHashes of all newly exported
     %Log Files
     
     %Create Stats to track progress

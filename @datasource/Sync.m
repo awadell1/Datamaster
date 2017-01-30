@@ -41,7 +41,7 @@ function timeNew = Sync(ds, varargin)
             % The Slowest sampling rate that the largest period
             newSamplePeriod = max(samplePeriod);
         case 'cheap'
-            % The cheapest sampling rate to compute will resample the fewest channels
+            % The cheapest sampling rate to compute will re-sample the fewest channels
             newSamplePeriod = mode(samplePeriod);
         otherwise
             errorStruct.message = sprintf('%s is not a valid syncType',syncType);
@@ -52,9 +52,9 @@ function timeNew = Sync(ds, varargin)
     %Create a new time inclusive time vector at the newSamplingRate
     timeNew = timeStart:newSamplePeriod:timeEnd;
     
-    %% Resample Channels as needed
+    %% Re-sample Channels as needed
     for i = 1:length(channels)
-        % Resample each channel
+        % Re-sample each channel
         ds.Data.(channels{i}).Value = interp1(...
             ds.Data.(channels{i}).Time,...
             ds.Data.(channels{i}).Value,...

@@ -1,6 +1,6 @@
 classdef Datamaster < handle
     % Datamaster handles exporting i2 Pro Log files from MoTeC i2 Pro,
-    % curating the exported datasources, enforing good data practices and
+    % curating the exported datasources, enforcing good data practices and
     % providing access to the datasource en mass
     
     properties (Access = private)
@@ -51,21 +51,19 @@ classdef Datamaster < handle
             %Updates the list of details that have been logged in the
             %database
             dm.Details = dm.mDir.fetch('SELECT DetailName.fieldName, DetailName.id FROM DetailName');
-            
-            warning('updateDetails will be removed in a future release')
+
         end
         
         function dm = updateChannels(dm)
             %Updates the list of channels that have been logged in the
             %database
             dm.Channels = dm.mDir.fetch('SELECT ChannelName.channelname, ChannelName.id FROM ChannelName');
-            
-            warning('updateChannels will be removed in a future release')
+
         end
         
     end
     
-    %% Function Signitures for Public Methods
+    %% Function Signatures for Public Methods
     methods (Access = public)
         status = CheckLogFileStatus(obj,LogFileLoc)
         

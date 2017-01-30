@@ -57,7 +57,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         %Commit Changes
         dm.mDir.conn.commit
         
-        %% Add Enteries
+        %% Add Entries
         
         %Record Details
         for i =1:length(fieldName)
@@ -99,7 +99,7 @@ function addEntry(dm, MoTeCFile, FinalHash, Details, channels)
         %Rollback Changes
         dm.mDir.conn.rollback();
         
-        %Rethrow Error
+        %Re throw Error
         rethrow(e);
     end
 end
