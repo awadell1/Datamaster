@@ -6,8 +6,7 @@ classdef datasource < handle
         Data = struct;          %Structure of Logged Data
         Entry = struct;         %Structure of masterDirectory
         Channel = {};           %Cell Array of logged channels
-        Detail = [];        %Structure of Details
-        Gate = struct;          %Structure for gating function
+        Detail = [];            %Structure of Details
         dm = [];                %Handle to Datamaster Object
         MatPath = '';           %Full path to .mat file
     end
@@ -66,8 +65,6 @@ classdef datasource < handle
         duration = driveTime(ds,varargin)
         
         newTime = Sync(varargin)
-        
-        setGate(ds, filterHandle)
         
         varargout = mapReduce(ds, mapFun, reduceFun, varargin)
         
