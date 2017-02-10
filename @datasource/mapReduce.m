@@ -24,7 +24,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     %% Filter out datasources missing required channels
     if ~isempty(p.Results.channel)
         %Find datasources with the required channels
-        hasRequired = dm.getIndex('channel', p.Results.channel);
+        hasRequired = dm.getIndex('channel', unique(p.Results.channel));
         
         %Get the index of the current datasources
         currentIndex = [ds.Index];
@@ -35,7 +35,7 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
         
         %If no datasource remain throw error
         if isempty(ds)
-            error('No datasources had all required channels');
+            error('No datasource had all required channels');
         end
     end
     
