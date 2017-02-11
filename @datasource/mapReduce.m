@@ -21,10 +21,18 @@ function varargout = mapReduce(ds, mapFun, reduceFun, varargin)
     %Grab datamaster from one of the datasources
     dm = ds(1).dm;
     
+    %% Check for repeated required channels
+    if ~iscell(p.Results.channel)
+        ReqChannel = {p.Results.channel};
+    else
+        ReqChannel = p.Results.channel;
+    end
+    ReqChannel = unique(ReqChannel);
+    
     %% Filter out datasources missing required channels
     if ~isempty(p.Results.channel)
         %Find datasources with the required channels
-        hasRequired = dm.getIndex('channel', unique(p.Results.channel));
+        hasRequired = dm.getIndex('channel', ReqChannel);
         
         %Get the index of the current datasources
         currentIndex = [ds.Index];
