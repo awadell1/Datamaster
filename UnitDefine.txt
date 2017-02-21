@@ -5,3 +5,6 @@ G = gravity
 
 #Lambda Ratio
 LA = []
+
+# Represent % as Percent
+percent = []

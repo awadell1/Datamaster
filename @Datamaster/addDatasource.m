@@ -33,7 +33,7 @@ function FinalHash = addDatasource(dm,MoTeCFile,saveFile,Details)
                                 
                 %Compress Time Field: Convert to Sample Rate
                 ds.(channels{i}).SampleRate = mean(diff(ds.(channels{i}).Time));
-                ds.(channels{i}).Time = rmfield(ds.(channels{i}).Time, 'Time');
+                ds.(channels{i}).Time = rmfield(ds.(channels{i}), 'Time');
             end
         end
         

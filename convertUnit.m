@@ -33,6 +33,7 @@ else
     oldUnit = strrep(oldUnit, '°', 'deg');  %Remove Degree symbol
     oldUnit = strrep(oldUnit, '·', '*');    %Remove Times symbol
     oldUnit = strrep(oldUnit, 'psi a', 'psi');    %Remove Times symbol
+    oldUnit = strrep(oldUnit, '%', 'percent'); %The % symbol is reserved in python
     
     %Put array into numpy array for conversion
     value = py.numpy.array(value);
@@ -51,6 +52,9 @@ else
     
     %Extract Unit String
     unit = valueNew.units.char;
+    
+    %Replace 'percent' with %
+    unit = strrep(unit, 'percent', '%');
     
     %Extract Magnitude to array
     newValue = py.numpy.array(valueNew.magnitude.tolist);

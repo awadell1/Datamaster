@@ -28,14 +28,8 @@ for i = 1:length(ds)
             
             %Convert Sample Rate to Time
             SampleRate = newChannel.SampleRate;
-            newChannel.Time = 0:SampleRate:(SampleRate*length(newChannel.Value));
-            
-            %Handle Unicode Charathers
-            switch newChannel.Units
-                case '°'
-                    newChannel.Units = 'deg';
-            end
-            
+            newChannel.Time = 0:SampleRate:SampleRate*(length(newChannel.Value)-1);
+                        
             %Append new Channel
             ds(i).Data.(vars{j}) = newChannel;
         end
