@@ -17,14 +17,27 @@ for i = 1:length(ds)
         assert(all(isfield(newData, channelNames(isMissing))),...
                 'Channel Not Logged');
         
-        %Append to Data
+        %Append to datasource Data field
         vars = fieldnames(newData);
         for j = 1:length(vars)
-            ds(i).Data.(vars{j}) = newData.(vars{j});
+            %Temp variable for newChannel
+            newChannel = newData.(vars{j});
             
-            %Replace ° with def
-            ds(i).Data.(vars{j}).Units = ...
-                strrep(newData.(vars{j}).Units, '°', 'deg');
+            %Decompress Channel Value
+            newChannel.Value = double(dunzip(newChannel.Value));
+            
+            %Convert Sample Rate to Time
+            SampleRate = newChannel.SampleRate;
+            newChannel.Time = 0:SampleRate:(SampleRate*length(newChannel.Value));
+            
+            %Handle Unicode Charathers
+            switch newChannel.Units
+                case '°'
+                    newChannel.Units = 'deg';
+            end
+            
+            %Append new Channel
+            ds(i).Data.(vars{j}) = newChannel;
         end
     end
 end
