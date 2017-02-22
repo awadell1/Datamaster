@@ -62,6 +62,9 @@ function [success,FinalHash] = ExportDatasource(dm,i2,MoTeCFile)
                 if exist(ldxPath,'file')
                     delete(ldxPath);
                 end
+            case 'MATLAB:webservices:HTTP403StatusCodeError'
+                %Download Failed
+                fprintf('Download Failed\n');
             otherwise
                 %Something Bad Happended
                 rethrow(e);

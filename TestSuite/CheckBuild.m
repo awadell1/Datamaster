@@ -1,6 +1,7 @@
-%% DatamasterWiki Location
+% DatamasterWiki Location
 wiki = Datamaster.getConfigSetting('wiki');
 
+%% Validate Datamaster
 %Get code to test
 exampleCode = getExampleCode(wiki);
 
@@ -12,6 +13,15 @@ for i = 1:length(exampleCode)
     delete(exampleCode{i, 1})
 end
 
+%% Run Performance Test
+perfTests = {'perfLoadChannel'};
+results = runperf(perfTests);
+
+%Report Mean Times
+fullTable = vertcat(results.Samples);
+varfun(@mean,fullTable,'InputVariables','MeasuredTime','GroupingVariables','Name')
+
+%% Helper Functions
 function exampleCode = getExampleCode(folder)
 %Scan Files for matlab code
 file = dir(folder);

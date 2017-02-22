@@ -8,3 +8,6 @@ LA = []
 
 # Represent % as Percent
 percent = []
+
+# Degree BTDC
+degBTDC = degree
