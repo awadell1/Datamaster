@@ -32,6 +32,13 @@ classdef Datamaster < handle
             % Get a list of Details and Channels that have been logged
             dm.updateDetails; dm.updateChannels;
             
+            % Check that /Python Code is on the python search path
+            pythonPath = fullfile(Datamaster.getPath, 'Python');
+            
+            if count(py.sys.path, pythonPath) == 0
+                py.sys.path.append(pythonPath);
+            end
+            
             %% Check for Updates - But Only once per session
             persistent flagChecked
             if isempty(flagChecked)
@@ -63,6 +70,9 @@ classdef Datamaster < handle
                     %don't recheck this session
                     warning('Unable to check for updates');
                     flagChecked = true;
+                    
+                    %Return to original directory
+                    cd(savedCd);
                 end
             end
         end

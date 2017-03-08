@@ -1,7 +1,4 @@
 function datasource = updateDriveInfo()
-    %Import Python Module for downloading Log File metadata
-    import py.ConnectGoogleDrive.*
-
     % Poll Google Drive for missing files
     fprintf('Polling Google Drive for new files...')
     client_id = Datamaster.getConfigSetting('client_id');

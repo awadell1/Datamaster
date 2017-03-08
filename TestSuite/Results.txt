@@ -1,0 +1,12 @@
+Performance Test: perfLoadChannel/CheckSingleChannelLoadingSpeed
+	Valid Test: 1
+	Time Mean: 0.277113
+	Time Std. Dev: 0.006371
+	Sample Count: 4
+
+Performance Test: perfLoadChannel/CheckMulti_ChannelLoading
+	Valid Test: 1
+	Time Mean: 0.493924
+	Time Std. Dev: 0.020733
+	Sample Count: 5
+

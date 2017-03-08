@@ -1,12 +1,13 @@
 % DatamasterWiki Location
 wiki = Datamaster.getConfigSetting('wiki');
+reportFile = [Datamaster.getPath, '\TestSuite\Results.txt'];
 
 %% Validate Datamaster
 %Get code to test
 exampleCode = getExampleCode(wiki);
 
 %Run Tests
-runtests([pwd; exampleCode(:, 1)])
+testResults = runtests([pwd; exampleCode(:, 1)]);
 
 %Clean up
 for i = 1:length(exampleCode)
@@ -15,11 +16,18 @@ end
 
 %% Run Performance Test
 perfTests = {'perfLoadChannel'};
-results = runperf(perfTests);
+perfResults = runperf(perfTests);
 
-%Report Mean Times
-fullTable = vertcat(results.Samples);
-varfun(@mean,fullTable,'InputVariables','MeasuredTime','GroupingVariables','Name')
+%Report Results
+fid = fopen(reportFile, 'a');
+for i = 1:length(perfResults)
+    fprintf(fid, 'Performance Test: %s\n', perfResults(i).Name);
+    fprintf(fid, '\tValid Test: %d\n', perfResults(i).Valid);
+    fprintf(fid, '\tTime Mean: %f s\n', mean(perfResults(i).Samples.MeasuredTime));
+    fprintf(fid, '\tTime Std. Dev: %f s\n', std(perfResults(i).Samples.MeasuredTime));
+    fprintf(fid, '\tSample Count: %d\n\n', length(perfResults(i).Samples.MeasuredTime));
+end
+fclose(fid);
 
 %% Helper Functions
 function exampleCode = getExampleCode(folder)
