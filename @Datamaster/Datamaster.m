@@ -20,7 +20,7 @@ classdef Datamaster < handle
         %% Class Constructor
         function dm = Datamaster()
             %Report Current Version info
-            reportGitInfo;
+            Datamaster.reportGitInfo;
             
             % Set Datastore Path
             dm.Datastore = Datamaster.getConfigSetting('datastore_path');
@@ -68,7 +68,8 @@ classdef Datamaster < handle
                 catch
                     %Warn user that we were unable to check for updates but
                     %don't recheck this session
-                    warning('Unable to check for updates');
+                    warning(['Unable to check for updates. ',...
+						'Have you added git to your system path?']);
                     flagChecked = true;
                     
                     %Return to original directory
