@@ -36,7 +36,7 @@ classdef Datamaster < handle
             pythonPath = fullfile(Datamaster.getPath, 'Python');
             
             if count(py.sys.path, pythonPath) == 0
-                py.sys.path.append(pythonPath);
+                insert(py.sys.path, int32(0), pythonPath);
             end
             
             %% Check for Updates - But Only once per session
@@ -139,10 +139,20 @@ classdef Datamaster < handle
             DatamasterPath = regexpi(which('Datamaster'),...
                 '(.*)\\@Datamaster\\Datamaster.m', 'tokens');
             DatamasterPath = DatamasterPath{:}{:};
-        end
+		end
+		
+		function reportGitInfo()
+			%Report Current Version info
+			gitInfo = getGitInfo(Datamaster.getPath);
+			if ~isempty(gitInfo)
+				fprintf('Version: %s - %s\n',gitInfo.branch, gitInfo.hash);
+				fprintf('Host: %s\n',gitInfo.url);
+			else
+				warning('You are not using git and will miss out on the latest updates');
+			end
+		end
         
         value = getConfigSetting(Key)
-        
         
         colormap(name)
         
